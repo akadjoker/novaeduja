@@ -13,16 +13,6 @@
             border-radius: 5px;
             z-index: 10;
         }
-        .info {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            background: rgba(255,255,255,0.8);
-            padding: 10px;
-            border-radius: 5px;
-            z-index: 10;
-            text-align: right;
-        }
         canvas { background: #f0f0f0; }
         button {
             margin-top: 10px;
@@ -45,14 +35,6 @@
         <label>Atrito: <input type="range" id="friction" min="0" max="0.05" step="0.01" value="0.01"></label><br>
         <button id="reset">Reiniciar</button>
     </div>
-
-    <div class="info">
-        <p><strong>Relações Matemáticas:</strong></p>
-        <p>Velocidade Linear (v): <span id="velocity">0</span> m/s</p>
-        <p>Velocidade Angular (ω): <span id="angularVelocity">0</span> rad/s</p>
-        <p>Raio (r): <span id="radius">200</span> m</p>
-    </div>
-
     <script>
         const Engine = Matter.Engine,
               Render = Matter.Render,
@@ -106,7 +88,6 @@
         document.getElementById('length').addEventListener('input', (e) => {
             World.remove(engine.world, constraint);
             pendulumLength = parseInt(e.target.value);
-            document.getElementById('radius').textContent = pendulumLength;
             constraint = Constraint.create({
                 pointA: anchor,
                 bodyB: bob,
@@ -146,18 +127,6 @@
 
         // Listener para redimensionamento da janela
         window.addEventListener('resize', resizeCanvas);
-
-        // Atualizar as relações matemáticas
-        setInterval(() => {
-            const velocityX = bob.velocity.x;
-            const velocityY = bob.velocity.y;
-            const angularVelocity = bob.angularVelocity;
-            const velocityLinear = Math.sqrt(velocityX ** 2 + velocityY ** 2);
-
-            document.getElementById('velocity').textContent = velocityLinear.toFixed(2);
-            document.getElementById('angularVelocity').textContent = angularVelocity.toFixed(2);
-        }, 100);
     </script>
 </body>
 </html>
-
