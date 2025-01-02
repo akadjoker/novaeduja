@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Movimento Uniforme e Uniformemente Variado</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css">
+    <style>
+        .simulation-container {
+            width: 800px;
+            height: 100px;
+            margin: 20px auto;
+            border: 2px solid #ccc;
+            background: #e8e8e8;
+            position: relative;
+        }
+        .object {
+            width: 20px;
+            height: 20px;
+            position: absolute;
+            top: 40px;
+            background: #4a90e2;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body class="bg-light">
+
+<div class="container my-5">
+    <div class="card shadow">
+        <div class="card-body">
+            <h2 class="card-title text-center">Movimento Uniforme e Uniformemente Variado</h2>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label for="v0" class="form-label">Velocidade Inicial (v₀): <span id="v0Value">50</span> m/s</label>
+                        <input type="range" class="form-range" id="v0" min="0" max="100" value="50">
+                    </div>
+                    <div class="mb-3">
+                        <label for="a" class="form-label">Aceleração (a): <span id="aValue">0</span> m/s²</label>
+                        <input type="range" class="form-range" id="a" min="-10" max="10" step="0.1" value="0">
+                    </div>
+                    <div class="mb-3">
+                        <label for="t" class="form-label">Tempo (t): <span id="tValue">5</span> s</label>
+                        <input type="range" class="form-range" id="t" min="1" max="10" step="0.1" value="5">
+                    </div>
+                    <button id="start" class="btn btn-primary w-100">Iniciar Simulação</button>
+                </div>
+                <div class="col-md-8">
+                    <div class="simulation-container">
+                        <div class="object" id="object"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <canvas id="positionChart" height="200"></canvas>
+    <canvas id="velocityChart" height="200"></canvas>
+    <canvas id="accelerationChart" height="200"></canvas>
+</div>
+
+<script>
+    $(document).ready(function () {
+        const $v0Slider = $("#v0");
+        const $aSlider = $("#a");
+        const $tSlider = $("#t");
+        const $v0Value = $("#v0Value");
+        const $aValue = $("#aValue");
+        const $tValue = $("#tValue");
+        const $object = $("#object");
+
+        let interval;
+
+        // Atualizar valores dos sliders
+        $v0Slider.on("input", function () {
+            $v0Value.text($(this).val());
+        });
+        $aSlider.on("input", function () {
+            $aValue.text($(this).val());
+        });
+        $tSlider.on("input", function () {
+            $tValue.text($(this).val());
+        });
+
+        // Iniciar Simulação
+        $("#start").click(function () {
+            clearInterval(interval); // Reinicia a simulação
+            const v0 = parseFloat($v0Slider.val());
+            const a = parseFloat($aSlider.val());
+            const tMax = parseFloat($tSlider.val());
+
+            let t = 0;
+            const dt = 0.1; // Incremento de tempo
+            const positions = [];
+            const velocities = [];
+            const accelerations = [];
+
+            interval = setInterval(() => {
+                if (t > tMax) {
+                    clearInterval(interval);
+                    return;
+                }
+
+                // Calcula posição, velocidade e aceleração
+                const s = v0 * t + 0.5 * a * t ** 2;
+                const v = v0 + a * t;
+
+                // Atualizar posição do objeto
+                const x = Math.min(s * 8, 780); // Escalar posição (limite de 800px)
+                $object.css("left", `${x}px`);
+
+                // Salvar dados para os gráficos
+                positions.push({ t, s });
+                velocities.push({ t, v });
+                accelerations.push({ t, a });
+
+                // Atualizar gráficos
+                updateChart(positionChart, positions, "Posição (m)");
+                updateChart(velocityChart, velocities, "Velocidade (m/s)");
+                updateChart(accelerationChart, accelerations, "Aceleração (m/s²)");
+
+                t += dt;
+            }, 100);
+        });
+
+        // Criar gráficos
+        const positionChart = createChart("positionChart", "Posição x Tempo");
+        const velocityChart = createChart("velocityChart", "Velocidade x Tempo");
+        const accelerationChart = createChart("accelerationChart", "Aceleração x Tempo");
+
+        function createChart(id, label) {
+            return new Chart(document.getElementById(id), {
+                type: "line",
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label,
+                        data: [],
+                        borderColor: "blue",
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: { title: { display: true, text: "Tempo (s)" } },
+                        y: { title: { display: true, text: label } }
+                    }
+                }
+            });
+        }
+
+        function updateChart(chart, data, label) {
+            chart.data.labels = data.map(d => d.t.toFixed(1));
+            chart.data.datasets[0].data = data.map(d => d[label === "Posição (m)" ? "s" : label === "Velocidade (m/s)" ? "v" : "a"]);
+            chart.update();
+        }
+    });
+</script>
+
+</body>
+</html>

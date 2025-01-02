@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lei de Hooke - Oscilação da Mola</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .simulation-container {
+            width: 400px;
+            height: 400px;
+            margin: 20px auto;
+            position: relative;
+            border: 2px solid #ccc;
+            background: #e8e8e8;
+            overflow: hidden;
+        }
+        .spring {
+            position: absolute;
+            width: 5px;
+            height: 200px;
+            background: #4a90e2;
+            left: 50%;
+            transform: translateX(-50%);
+            top: 0;
+        }
+        .mass {
+            width: 50px;
+            height: 50px;
+            background: #f04a49;
+            position: absolute;
+            top: 200px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body class="bg-light">
+
+<div class="container my-5">
+    <div class="card shadow">
+        <div class="card-body">
+            <h2 class="card-title text-center">Lei de Hooke - Oscilação da Mola</h2>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label for="k" class="form-label">Constante Elástica (k): <span id="kValue">50</span> N/m</label>
+                        <input type="range" class="form-range" id="k" min="10" max="100" value="50">
+                    </div>
+                    <div class="mb-3">
+                        <label for="mass" class="form-label">Massa (m): <span id="massValue">1.0</span> kg</label>
+                        <input type="range" class="form-range" id="mass" min="0.5" max="5" step="0.1" value="1.0">
+                    </div>
+                    <div class="mb-3">
+                        <label for="amplitude" class="form-label">Amplitude Inicial (A): <span id="amplitudeValue">50</span> px</label>
+                        <input type="range" class="form-range" id="amplitude" min="10" max="100" value="50">
+                    </div>
+                    <button id="start" class="btn btn-primary w-100">Iniciar Simulação</button>
+                </div>
+                <div class="col-md-8">
+                    <div class="simulation-container">
+                        <div class="spring" id="spring"></div>
+                        <div class="mass" id="mass"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <canvas id="positionChart" height="200"></canvas>
+    <canvas id="velocityChart" height="200"></canvas>
+    <canvas id="accelerationChart" height="200"></canvas>
+</div>
+
+<script>
+    $(document).ready(function () {
+        const $kSlider = $("#k");
+        const $massSlider = $("#mass");
+        const $amplitudeSlider = $("#amplitude");
+        const $kValue = $("#kValue");
+        const $massValue = $("#massValue");
+        const $amplitudeValue = $("#amplitudeValue");
+        const $mass = $("#mass");
+        const $spring = $("#spring");
+
+        let interval;
+
+        // Atualizar valores dos sliders
+        $kSlider.on("input", function () {
+            $kValue.text($(this).val());
+        });
+        $massSlider.on("input", function () {
+            $massValue.text($(this).val());
+        });
+        $amplitudeSlider.on("input", function () {
+            $amplitudeValue.text($(this).val());
+        });
+
+        // Iniciar Simulação
+        $("#start").click(function () {
+            clearInterval(interval); // Reinicia a simulação
+            const k = parseFloat($kSlider.val());
+            const m = parseFloat($massSlider.val());
+            const amplitude = parseFloat($amplitudeSlider.val());
+
+            const omega = Math.sqrt(k / m); // Frequência angular
+            let t = 0;
+            const dt = 0.02;
+
+            const positions = [];
+            const velocities = [];
+            const accelerations = [];
+
+            interval = setInterval(() => {
+                const position = amplitude * Math.cos(omega * t); // Posição: x(t) = A * cos(ωt)
+                const velocity = -amplitude * omega * Math.sin(omega * t); // Velocidade: v(t) = -Aωsin(ωt)
+                const acceleration = -k / m * position; // Aceleração: a(t) = -kx/m
+
+                // Atualizar posição da massa e da mola
+                const massTop = 200 + position; // Nova posição da massa
+                $mass.css("top", `${massTop}px`);
+                $spring.css("height", `${massTop}px`);
+
+                // Salvar dados para gráficos
+                positions.push({ t, position });
+                velocities.push({ t, velocity });
+                accelerations.push({ t, acceleration });
+
+                // Atualizar gráficos
+                updateChart(positionChart, positions, "Posição (px)");
+                updateChart(velocityChart, velocities, "Velocidade (px/s)");
+                updateChart(accelerationChart, accelerations, "Aceleração (px/s²)");
+
+                t += dt;
+                if (t > 10) clearInterval(interval); // Limitar a 10 segundos
+            }, 20);
+        });
+
+        // Criar gráficos
+        const positionChart = createChart("positionChart", "Posição x Tempo");
+        const velocityChart = createChart("velocityChart", "Velocidade x Tempo");
+        const accelerationChart = createChart("accelerationChart", "Aceleração x Tempo");
+
+        function createChart(id, label) {
+            return new Chart(document.getElementById(id), {
+                type: "line",
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label,
+                        data: [],
+                        borderColor: "blue",
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: { title: { display: true, text: "Tempo (s)" } },
+                        y: { title: { display: true, text: label } }
+                    }
+                }
+            });
+        }
+
+        function updateChart(chart, data, label) {
+            chart.data.labels = data.map(d => d.t.toFixed(1));
+            chart.data.datasets[0].data = data.map(d => d[label === "Posição (px)" ? "position" : label === "Velocidade (px/s)" ? "velocity" : "acceleration"]);
+            chart.update();
+        }
+    });
+</script>
+
+</body>
+</html>

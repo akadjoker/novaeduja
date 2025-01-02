@@ -19,5 +19,19 @@
       "screenshot": "demos/screenshots/plano.webp",
       "arquivo": "demos/fisica/plano.html",
       "descricao": "Fisica no plano inclinado"
+    },
+    {
+      "id": "Movimento Uniforme e Uniformemente Variado",
+      "titulo": "Movimento Uniforme e Uniformemente Variado",
+      "screenshot": "demos/screenshots/mum.webp",
+      "arquivo": "demos/fisica/mum.html",
+      "descricao": "Fisica no plano inclinado"
+    },{
+      "id": "mola",
+      "titulo": "Lei de Hooke - Oscilação da Mola",
+      "screenshot": "demos/screenshots/mola.webp",
+      "arquivo": "demos/fisica/mola.html",
+      "descricao": "Explore o comportamento oscilatório de uma mola ajustando constante elástica e massa."
     }
+    
   ]
