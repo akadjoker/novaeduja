@@ -1,0 +1,16 @@
+[
+    {
+      "id": "pendulo",
+      "titulo": "Pêndulo Simples",
+      "screenshot": "demos/screenshots/none.webp",
+      "arquivo": "demos/fisica/pendulo.html",
+      "descricao": "Simulação de um pêndulo com controles de comprimento e gravidade"
+    },
+    {
+      "id": "mcu",
+      "titulo": "Movimento Circular Uniforme",
+      "screenshot": "demos/screenshots/none.webp",
+      "arquivo": "demos/fisica/mcu.html",
+      "descricao": "Visualização do MCU com controle de velocidade e raio"
+    }
+  ]

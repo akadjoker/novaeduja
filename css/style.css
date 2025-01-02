@@ -212,7 +212,7 @@ body {
 .mobile-menu {
   display: none;
 }
-
+/* Menu mobile (até 767px) */
 @media (max-width: 767px) {
   .mobile-menu {
     display: block;
@@ -220,10 +220,12 @@ body {
 
   .menu-container,
   .menu-intermediate {
-    display: none;
-    /* Esconde menus intermediário e completo */
+    display: none; /* Esconde menus intermediário e completo */
   }
-  
+
+  .overlay {
+    display: block; /* Overlay visível no mobile */
+  }
 }
 
 /* Menu intermediário (768px a 1165px) */
@@ -233,14 +235,16 @@ body {
 
 @media (min-width: 768px) and (max-width: 1165px) {
   .menu-intermediate {
-    display: flex;
-    /* Mostra o menu intermediário */
+    display: flex; /* Mostra o menu intermediário */
   }
 
   .mobile-menu,
   .menu-container {
-    display: none;
-    /* Esconde os outros menus */
+    display: none; /* Esconde os outros menus */
+  }
+
+  .overlay {
+    display: none; /* Esconde o overlay no menu intermediário */
   }
 }
 
@@ -251,13 +255,15 @@ body {
 
 @media (min-width: 1166px) {
   .menu-container {
-    display: flex;
-    /* Mostra o menu completo */
+    display: flex; /* Mostra o menu completo */
   }
 
   .mobile-menu,
   .menu-intermediate {
-    display: none;
-    /* Esconde os outros menus */
+    display: none; /* Esconde os outros menus */
+  }
+
+  .overlay {
+    display: none; /* Esconde o overlay no menu completo */
   }
 }

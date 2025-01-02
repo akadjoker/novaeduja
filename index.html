@@ -173,7 +173,7 @@
             }
         });
 
-        // Alterna entre expandido e recolhido ao clicar
+        
         $toggle.on('click', function () {
             $menuIntermediate.toggleClass('expanded');
         });
@@ -218,12 +218,12 @@
                 });
             });
         });
-    // Adiciona um evento para monitorar o redimensionamento da janela
-window.addEventListener('resize', () => {
-  const width = window.innerWidth;  // Largura da janela
-  const height = window.innerHeight; // Altura da janela
-  console.log(`Largura: ${width}px, Altura: ${height}px`);
-});
+    
+        window.addEventListener('resize', () => {
+        const width = window.innerWidth;  // Largura da janela
+        const height = window.innerHeight; // Altura da janela
+        console.log(`Largura: ${width}px, Altura: ${height}px`);
+        });
 
     
     </script>

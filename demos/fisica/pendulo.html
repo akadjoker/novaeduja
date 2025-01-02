@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pêndulo Simples</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+    <style>
+        .controls {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            background: rgba(255,255,255,0.8);
+            padding: 10px;
+            border-radius: 5px;
+        }
+        canvas { background: #f0f0f0; }
+    </style>
+</head>
+<body>
+    <div class="controls">
+        <label>Comprimento: <input type="range" id="length" min="100" max="300" value="200"></label><br>
+        <label>Gravidade: <input type="range" id="gravity" min="0" max="2" step="0.1" value="1"></label>
+    </div>
+    <script>
+        const Engine = Matter.Engine,
+              Render = Matter.Render,
+              World = Matter.World,
+              Bodies = Matter.Bodies,
+              Constraint = Matter.Constraint;
+
+        const engine = Engine.create();
+        const render = Render.create({
+            element: document.body,
+            engine: engine,
+            options: {
+                width: 800,
+                height: 600,
+                wireframes: false
+            }
+        });
+
+        let pendulumLength = 200;
+        const anchor = { x: 400, y: 100 };
+        const bob = Bodies.circle(400, 300, 20, {
+            render: { fillStyle: '#4a90e2' }
+        });
+        
+        let constraint = Constraint.create({
+            pointA: anchor,
+            bodyB: bob,
+            length: pendulumLength,
+            stiffness: 1
+        });
+
+        World.add(engine.world, [bob, constraint]);
+        Engine.run(engine);
+        Render.run(render);
+
+        document.getElementById('length').addEventListener('input', (e) => {
+            World.remove(engine.world, constraint);
+            pendulumLength = parseInt(e.target.value);
+            constraint = Constraint.create({
+                pointA: anchor,
+                bodyB: bob,
+                length: pendulumLength,
+                stiffness: 1
+            });
+            World.add(engine.world, constraint);
+        });
+
+        document.getElementById('gravity').addEventListener('input', (e) => {
+            engine.world.gravity.y = e.target.value;
+        });
+    </script>
+</body>
+</html>
