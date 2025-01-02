@@ -11,21 +11,38 @@
             background: rgba(255,255,255,0.8);
             padding: 10px;
             border-radius: 5px;
+            z-index: 10;
         }
         canvas { background: #f0f0f0; }
+        button {
+            margin-top: 10px;
+            padding: 5px 10px;
+            background: #4a90e2;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #357ab8;
+        }
     </style>
 </head>
 <body>
     <div class="controls">
         <label>Comprimento: <input type="range" id="length" min="100" max="300" value="200"></label><br>
-        <label>Gravidade: <input type="range" id="gravity" min="0" max="2" step="0.1" value="1"></label>
+        <label>Gravidade: <input type="range" id="gravity" min="0" max="2" step="0.1" value="1"></label><br>
+        <label>Atrito: <input type="range" id="friction" min="0" max="0.05" step="0.01" value="0.01"></label><br>
+        <button id="reset">Reiniciar</button>
     </div>
     <script>
         const Engine = Matter.Engine,
               Render = Matter.Render,
               World = Matter.World,
               Bodies = Matter.Bodies,
-              Constraint = Matter.Constraint;
+              Constraint = Matter.Constraint,
+              Mouse = Matter.Mouse,
+              MouseConstraint = Matter.MouseConstraint;
 
         const engine = Engine.create();
         const render = Render.create({
@@ -41,9 +58,10 @@
         let pendulumLength = 200;
         const anchor = { x: 400, y: 100 };
         const bob = Bodies.circle(400, 300, 20, {
-            render: { fillStyle: '#4a90e2' }
+            render: { fillStyle: '#4a90e2' },
+            frictionAir: 0.01
         });
-        
+
         let constraint = Constraint.create({
             pointA: anchor,
             bodyB: bob,
@@ -51,7 +69,18 @@
             stiffness: 1
         });
 
-        World.add(engine.world, [bob, constraint]);
+        const mouse = Mouse.create(render.canvas);
+        const mouseConstraint = MouseConstraint.create(engine, {
+            mouse: mouse,
+            constraint: {
+                stiffness: 0.2,
+                render: {
+                    visible: false
+                }
+            }
+        });
+
+        World.add(engine.world, [bob, constraint, mouseConstraint]);
         Engine.run(engine);
         Render.run(render);
 
@@ -69,6 +98,15 @@
 
         document.getElementById('gravity').addEventListener('input', (e) => {
             engine.world.gravity.y = e.target.value;
+        });
+
+        document.getElementById('friction').addEventListener('input', (e) => {
+            bob.frictionAir = parseFloat(e.target.value);
+        });
+
+        document.getElementById('reset').addEventListener('click', () => {
+            Matter.Body.setPosition(bob, { x: 400, y: 300 });
+            Matter.Body.setVelocity(bob, { x: 0, y: 0 });
         });
     </script>
 </body>
