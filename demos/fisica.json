@@ -2,15 +2,22 @@
     {
       "id": "pendulo",
       "titulo": "Pêndulo Simples",
-      "screenshot": "demos/screenshots/none.webp",
+      "screenshot": "demos/screenshots/pendulo.webp",
       "arquivo": "demos/fisica/pendulo.html",
       "descricao": "Simulação de um pêndulo com controles de comprimento e gravidade"
     },
     {
       "id": "mcu",
       "titulo": "Movimento Circular Uniforme",
-      "screenshot": "demos/screenshots/none.webp",
+      "screenshot": "demos/screenshots/mcu.webp",
       "arquivo": "demos/fisica/mcu.html",
       "descricao": "Visualização do MCU com controle de velocidade e raio"
+    },
+    {
+      "id": "plano",
+      "titulo": "Plano inclinado",
+      "screenshot": "demos/screenshots/plano.webp",
+      "arquivo": "demos/fisica/plano.html",
+      "descricao": "Fisica no plano inclinado"
     }
   ]
