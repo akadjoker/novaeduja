@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página Moderna</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/2.3.0/alpine.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/style.css">
+   
+</head>
+<body x-data="{ darkMode: false, menuOpen: false }" :class="{ 'dark': darkMode }">
+    <nav class="nav-custom fixed w-full shadow-lg z-50">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center h-14">
+                <!-- Logo -->
+                <div class="logo flex-shrink-0">
+                    <img id="logo" src="img/logos/logo.jpe" alt="Logo">
+                </div>
+                
+                <!-- Título -->
+                <div class="flex-shrink-0 text-2xl font-bold">
+                    NovaEduJa
+                </div>
+
+                <!-- Desktop Menu -->
+                <div class="menu-container hidden md:flex"id="menu">
+                 
+                    <a href="#" class="menu-link" data-page="inicio.html"><i class="bi bi-house-door-fill"></i>Início</a>
+                    <a href="#" class="menu-link" data-page="fisica.html"><i class="bi bi-lightning-fill"></i>Física</a>
+                    <a href="#" class="menu-link" data-page="matematica.html"><i class="bi bi-calculator-fill"></i>Matemática</a>
+                    <a href="#" class="menu-link" data-page="robotica.html"><i class="bi bi-robot"></i>Robótica</a>
+                    <a href="#" class="menu-link" data-page="sobre.html"><i class="bi bi-info-circle-fill"></i>Sobre</a> 
+                    <a href="#" class="menu-link" data-page="contatos.html"><i class="bi bi-envelope-fill"></i>Contatos</a>
+                    <a href="#" class="menu-link" data-page="parceiros.html"><i class="bi bi-people-fill"></i>Parceiros</a>
+               
+                    <!-- <div class="menu-auxilio">
+                        <i class="bi bi-list"> 
+                        Menu </i> 
+                        <ul class="submenu">
+                            <li><a href="#" class="menu-link" data-page="matematica.html"><i class="bi bi-calculator-fill"></i>Matemática</a></li>
+                            <li><a href="#" class="menu-link" data-page="robotica.html"><i class="bi bi-robot"></i>Robótica</a></li>
+                            <li><a href="#" class="menu-link" data-page="fisica.html"><i class="bi bi-lightning-fill"></i>Física</a></li>
+                        </ul>
+                    </div> -->
+                </div>
+
+                <!-- Botões -->
+                <div class="flex items-center gap-4">
+                    <button @click="darkMode = !darkMode" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+                        <i class="bi" :class="darkMode ? 'bi-sun-fill' : 'bi-moon-fill'"></i>
+                    </button>
+                    <button @click="menuOpen = !menuOpen" class="md:hidden p-2">
+                        <i class="bi" :class="menuOpen ? 'bi-x-lg' : 'bi-list'"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        <!-- <div class="mobile-menu" id="menu-mobile" x-show="menuOpen" x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0 transform -translate-x-full"
+            x-transition:enter-end="opacity-100 transform translate-x-0"
+            x-transition:leave="transition ease-in duration-200"
+            x-transition:leave-start="opacity-100 transform translate-x-0"
+            x-transition:leave-end="opacity-0 transform -translate-x-full" class="mobile-menu md:hidden">
+            <a href="#" class="menu-link" data-page="inicio.html"><i class="bi bi-house-door-fill"></i>Início</a>
+            <a href="#" class="menu-link" data-page="fisica.html"><i class="bi bi-lightning-fill"></i>Física</a>
+            <a href="#" class="menu-link" data-page="matematica.html"><i class="bi bi-calculator-fill"></i>Matemática</a>
+            <a href="#" class="menu-link" data-page="robotica.html"><i class="bi bi-robot"></i>Robótica</a>
+            <a href="#" class="menu-link" data-page="sobre.html"><i class="bi bi-info-circle-fill"></i>Sobre</a>
+            <a href="#" class="menu-link" data-page="contatos.html"><i class="bi bi-envelope-fill"></i>Contatos</a>
+            <a href="#" class="menu-link" data-page="parceiros.html"><i class="bi bi-people-fill"></i>Parceiros</a>
+        </div> -->
+        
+      
+        
+            <!-- Menu Mobile -->
+            <div class="mobile-menu" id="menu-mobile" x-show="menuOpen"  x-transition:enter="transition ease-out duration-300"
+                x-transition:enter-start="opacity-0 transform translate-x-full"
+                x-transition:enter-end="opacity-100 transform translate-x-0"
+                x-transition:leave="transition ease-in duration-200"
+                x-transition:leave-start="opacity-100 transform translate-x-0"
+                x-transition:leave-end="opacity-0 transform translate-x-full"
+                class="mobile-menu fixed top-0 right-0 w-64 h-full bg-white shadow-lg z-50 md:hidden">
+                <a href="#" class="menu-link" data-page="inicio.html"><i class="bi bi-house-door-fill"></i>Início</a>
+                <a href="#" class="menu-link" data-page="fisica.html"><i class="bi bi-lightning-fill"></i>Física</a>
+                <a href="#" class="menu-link" data-page="matematica.html"><i class="bi bi-calculator-fill"></i>Matemática</a>
+                <a href="#" class="menu-link" data-page="robotica.html"><i class="bi bi-robot"></i>Robótica</a>
+                <a href="#" class="menu-link" data-page="sobre.html"><i class="bi bi-info-circle-fill"></i>Sobre</a>
+                <a href="#" class="menu-link" data-page="contatos.html"><i class="bi bi-envelope-fill"></i>Contatos</a>
+                <a href="#" class="menu-link" data-page="parceiros.html"><i class="bi bi-people-fill"></i>Parceiros</a>
+            </div>
+        
+        
+    
+            <!-- Menu intermedio -->
+        <div class="menu-intermediate" id="menu-intermediate">
+            <a href="#" class="menu-link" data-page="inicio.html"><i class="bi bi-house-door-fill"></i>Início</a>
+            <a href="#" class="menu-link" data-page="fisica.html"><i class="bi bi-lightning-fill"></i>Física</a>
+            <a href="#" class="menu-link" data-page="matematica.html"><i class="bi bi-calculator-fill"></i>Matemática</a>
+            <a href="#" class="menu-link" data-page="robotica.html"><i class="bi bi-robot"></i>Robótica</a>
+            <a href="#" class="menu-link" data-page="sobre.html"><i class="bi bi-info-circle-fill"></i>Sobre</a> 
+            <a href="#" class="menu-link" data-page="contatos.html"><i class="bi bi-envelope-fill"></i>Contatos</a>
+            <a href="#" class="menu-link" data-page="parceiros.html"><i class="bi bi-people-fill"></i>Parceiros</a>
+
+        </div>
+
+
+    </nav>
+
+    <!-- Overlay -->
+    <div x-show="menuOpen" x-transition:enter="transition-opacity duration-300" x-transition:enter-start="opacity-0"
+        x-transition:enter-end="opacity-100" x-transition:leave="transition-opacity duration-200"
+        x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="overlay">
+    </div>
+
+    <!-- Main Content -->
+    <main id="main-content" class="container mx-auto px-4 pt-20">
+      
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer-custom mt-auto py-8">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <h3 class="text-lg font-bold mb-4">Sobre Nós</h3>
+                    <p class="card-text">Dedicados à excelência no ensino de ciências e tecnologia.</p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold mb-4">Links Úteis</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="footer-link">Política de Privacidade</a></li>
+                        <li><a href="#" class="footer-link">Termos de Uso</a></li>
+                        <li><a href="#" class="footer-link">FAQ</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold mb-4">Contato</h3>
+                    <p class="card-text">Email: contato@novaeduja.com</p>
+                    <p class="card-text">Tel: 910204444</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Script -->
+    <script>
+ 
+
+
+        $(document).ready(function () 
+        {
+            const $menu = $('#menu-intermediate');
+            const $toggle = $('#menu-toggle');
+            $menu.on('mouseenter', function () {
+            if (!$menu.hasClass('fixed')) {
+                $menu.addClass('expanded');
+            }
+        });
+
+        // Recolhe o menu ao remover o mouse, se não estiver fixado
+        $menu.on('mouseleave', function () {
+            if (!$menu.hasClass('fixed')) {
+                $menu.removeClass('expanded');
+            }
+        });
+
+        // Alterna entre expandido e recolhido ao clicar
+        $toggle.on('click', function () {
+            $menuIntermediate.toggleClass('expanded');
+        });
+
+
+            $("#main-content").load("inicio.html", function (response, status, xhr) 
+            {
+                if (status === "error") 
+                {
+                    $("#main-content").html("<p class='text-center text-danger'>Erro ao carregar o conteúdo inicial. Por favor, tente novamente.</p>");
+                } else
+                {
+                    $("#logo").attr("src", "img/logos/logo.jpg");
+                }
+            });
+    
+            $(".menu-link").on("click", function (e) 
+            {
+                e.preventDefault(); // Evita comportamento padrão do link
+    
+                const page = $(this).data("page"); // Obtém a página do atributo data-page
+    
+                const logos = {
+                "fisica.html": "img/logos/fisica.jpg",   
+                "matematica.html": "img/logos/mate.jpg",
+                "robotica.html": "img/logos/robo.jpg",
+                "sobre.html": "img/logos/about.jpg",
+                "contatos.html": "img/logos/contacts.jpg",
+                "parceiros.html": "img/logos/parceiros.jpg",
+                "inicio.html": "img/logos/logo.jpg"
+            };
+            
+                $("#main-content").load(page, function (response, status, xhr) 
+                {
+                    if (status === "error") 
+                    {
+                        $("#main-content").html("<p class='text-center text-danger'>Erro ao carregar o conteúdo. Por favor, tente novamente.</p>");
+                    } else 
+                    {
+                        $("#logo").attr("src", logos[page]);
+                    }
+                });
+            });
+        });
+    // Adiciona um evento para monitorar o redimensionamento da janela
+window.addEventListener('resize', () => {
+  const width = window.innerWidth;  // Largura da janela
+  const height = window.innerHeight; // Altura da janela
+  console.log(`Largura: ${width}px, Altura: ${height}px`);
+});
+
+    
+    </script>
+</body>
