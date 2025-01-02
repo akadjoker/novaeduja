@@ -49,15 +49,15 @@
             element: document.body,
             engine: engine,
             options: {
-                width: 800,
-                height: 600,
+                width: window.innerWidth, // Dimensão inicial com base na janela
+                height: window.innerHeight, // Dimensão inicial com base na janela
                 wireframes: false
             }
         });
 
         let pendulumLength = 200;
-        const anchor = { x: 400, y: 100 };
-        const bob = Bodies.circle(400, 300, 20, {
+        const anchor = { x: window.innerWidth / 2, y: 100 };
+        const bob = Bodies.circle(window.innerWidth / 2, 300, 20, {
             render: { fillStyle: '#4a90e2' },
             frictionAir: 0.01
         });
@@ -84,6 +84,7 @@
         Engine.run(engine);
         Render.run(render);
 
+        // Atualiza o comprimento do pêndulo
         document.getElementById('length').addEventListener('input', (e) => {
             World.remove(engine.world, constraint);
             pendulumLength = parseInt(e.target.value);
@@ -96,18 +97,36 @@
             World.add(engine.world, constraint);
         });
 
+        // Atualiza a gravidade
         document.getElementById('gravity').addEventListener('input', (e) => {
-            engine.world.gravity.y = e.target.value;
+            engine.world.gravity.y = parseFloat(e.target.value);
         });
 
+        // Atualiza o atrito
         document.getElementById('friction').addEventListener('input', (e) => {
             bob.frictionAir = parseFloat(e.target.value);
         });
 
+        // Reinicia a posição do pêndulo
         document.getElementById('reset').addEventListener('click', () => {
-            Matter.Body.setPosition(bob, { x: 400, y: 300 });
+            Matter.Body.setPosition(bob, { x: window.innerWidth / 2, y: 300 });
             Matter.Body.setVelocity(bob, { x: 0, y: 0 });
         });
+
+        // Função para redimensionar o canvas com base na janela
+        const resizeCanvas = () => {
+            render.canvas.width = window.innerWidth;
+            render.canvas.height = window.innerHeight;
+            render.options.width = window.innerWidth;
+            render.options.height = window.innerHeight;
+
+            // Reposiciona o pêndulo com base no novo tamanho da janela
+            anchor.x = window.innerWidth / 2;
+            Matter.Body.setPosition(bob, { x: window.innerWidth / 2, y: 300 });
+        };
+
+        // Listener para redimensionamento da janela
+        window.addEventListener('resize', resizeCanvas);
     </script>
 </body>
 </html>
