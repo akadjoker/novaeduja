@@ -1,75 +1,198 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Plano Inclinado</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Física Divertida</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css">
     <style>
-        .controls {
-            position: fixed;
-            top: 10px;
-            left: 10px;
-            background: rgba(255,255,255,0.8);
-            padding: 10px;
-            border-radius: 5px;
+        body { background: #000; margin: 0; overflow: hidden; height: 95%; }
+        #controls { 
+            position: absolute; 
+            top: 10px; 
+            right: 10px; 
+            width: 150px; 
+            background: rgba(255,255,255,0.1); 
+            padding: 8px; 
+            border-radius: 5px; 
+            color: #fff;
         }
-        canvas { background: #f0f0f0; }
+        .info-label {
+            position: absolute;
+            color: #4fc3f7;
+            font-family: monospace;
+            font-size: 14px;
+            pointer-events: none;
+        }
+        canvas { display: block; }
     </style>
 </head>
 <body>
-    <div class="controls">
-        <label>Ângulo: <input type="range" id="angle" min="0" max="45" step="1" value="20"></label><br>
-        <label>Atrito: <input type="range" id="friction" min="0" max="1" step="0.1" value="0.1"></label><br>
-        <label>Gravidade: <input type="range" id="gravity" min="0" max="2" step="0.1" value="1"></label>
+    <div id="controls">
+        <input type="range" id="angle" min="0" max="45" value="20" class="form-range mb-1">
+        <small>Ângulo: <span id="angleValue">20</span>°</small>
+        <input type="range" id="friction" min="0" max="1" step="0.1" value="0.1" class="form-range mb-1">
+        <small>Atrito: <span id="frictionValue">0.1</span></small>
+        <button id="reset" class="btn btn-sm btn-outline-light w-100 mt-1">Reiniciar</button>
     </div>
-    <script>
-        const Engine = Matter.Engine,
-              Render = Matter.Render,
-              World = Matter.World,
-              Bodies = Matter.Bodies;
+    <div id="velocityLabel" class="info-label"></div>
+    <div id="accelerationLabel" class="info-label"></div>
+    <div id="energyLabel" class="info-label"></div>
 
-        const engine = Engine.create();
-        const render = Render.create({
-            element: document.body,
-            engine: engine,
-            options: {
-                width: 800,
-                height: 600,
-                wireframes: false
+<script>
+let engine, world, block, plane, mouseConstraint;
+let canvas;
+let isDragging = false;
+let gapBottom = 100;
+
+function setup() {
+    canvas = createCanvas(windowWidth, windowHeight*0.95);
+    
+    engine = Matter.Engine.create();
+    world = engine.world;
+
+    // Mouse constraint setup
+    const mouse = Matter.Mouse.create(canvas.elt);
+    mouseConstraint = Matter.MouseConstraint.create(engine, {
+        mouse: mouse,
+        constraint: {
+            stiffness: 0.2,
+            render: { visible: false }
+        }
+    });
+
+    mouse.pixelRatio = pixelDensity();
+    Matter.World.add(world, mouseConstraint);
+
+    // Mouse events
+    Matter.Events.on(mouseConstraint, 'mousedown', function(event) {
+        if (mouseConstraint.body === block) {
+            isDragging = true;
+        }
+    });
+
+    Matter.Events.on(mouseConstraint, 'mouseup', function(event) {
+        isDragging = false;
+    });
+
+    createSimulation();
+    Matter.Engine.run(engine);
+}
+
+function draw() {
+    background(0);
+    drawBodies();
+    updateLabels();
+    
+    // Draw mouse position when dragging
+    if (isDragging) {
+        push();
+        stroke('#4fc3f7');
+        strokeWeight(2);
+        noFill();
+        line(block.position.x, block.position.y, mouseX, mouseY);
+        pop();
+    }
+}
+
+function drawBodies() {
+    push();
+    strokeWeight(2);
+    world.bodies.forEach(body => {
+        if (body.label === 'Rectangle Body') {
+            beginShape();
+            if (body === block) {
+                fill(isDragging ? '#29b6f6' : '#4fc3f7');
+                stroke('#29b6f6');
+            } else {
+                fill('#333');
+                stroke('#444');
             }
-        });
+            body.vertices.forEach(v => vertex(v.x, v.y));
+            endShape(CLOSE);
+        }
+    });
+    pop();
+}
 
-        const ground = Bodies.rectangle(400, 500, 800, 20, {
-            isStatic: true,
-            angle: -Math.PI / 9,
-            render: {
-                fillStyle: '#868686'
+function updateLabels() {
+    if (block) {
+        const vel = Math.sqrt(block.velocity.x * block.velocity.x + block.velocity.y * block.velocity.y);
+        const angle = parseFloat(document.getElementById('angle').value);
+        const acceleration = 9.81 * sin(angle * PI / 180);
+        const height = (windowHeight - block.position.y) / 100;
+        const energy = 9.81 * height * block.mass;
+
+        document.getElementById('velocityLabel').style.left = '10px';
+        document.getElementById('velocityLabel').style.top = '10px';
+        document.getElementById('velocityLabel').innerHTML = `Velocidade: ${vel.toFixed(2)} m/s`;
+
+        document.getElementById('accelerationLabel').style.left = '10px';
+        document.getElementById('accelerationLabel').style.top = '30px';
+        document.getElementById('accelerationLabel').innerHTML = `Aceleração: ${acceleration.toFixed(2)} m/s²`;
+
+        document.getElementById('energyLabel').style.left = '10px';
+        document.getElementById('energyLabel').style.top = '50px';
+        document.getElementById('energyLabel').innerHTML = `Energia Potencial: ${energy.toFixed(2)} J`;
+    }
+}
+
+function createSimulation() {
+    Matter.World.clear(world);
+    createBounds();
+
+    const angle = parseFloat(document.getElementById('angle').value);
+    const friction = parseFloat(document.getElementById('friction').value);
+    
+    plane = Matter.Bodies.rectangle(width/2, height-100, width/2, 20, {
+        isStatic: true,
+        angle: angle * PI / 180,
+        friction: friction
+    });
+
+    block = Matter.Bodies.rectangle(width/2-200, height-300, 40, 40, {
+        friction: friction,
+        mass: 1
+    });
+
+    Matter.World.add(world, [plane, block]);
+    Matter.World.add(world, mouseConstraint);
+}
+
+function createBounds() {
+    const bounds = [
+        Matter.Bodies.rectangle(width/2, -10, width, 20, { isStatic: true }),
+        Matter.Bodies.rectangle(-10, height/2, 20, height, { isStatic: true }),
+        Matter.Bodies.rectangle(width/2, height+10, width, 20, { isStatic: true }),
+        Matter.Bodies.rectangle(width+10, height/2, 20, height, { isStatic: true })
+    ];
+    Matter.World.add(world, bounds);
+}
+
+function windowResized() {
+    resizeCanvas(windowWidth, windowHeight*0.95);
+    createBounds();
+}
+
+document.querySelectorAll('#angle, #friction').forEach(el => {
+    el.addEventListener('input', function() {
+        document.getElementById(`${this.id}Value`).textContent = this.value;
+        if(plane && block) {
+            if(this.id === 'angle') {
+                Matter.Body.setAngle(plane, this.value * PI / 180);
             }
-        });
-
-        const block = Bodies.rectangle(400, 400, 50, 50, {
-            friction: 0.1,
-            render: {
-                fillStyle: '#4a90e2'
+            if(this.id === 'friction') {
+                plane.friction = this.value;
+                block.friction = this.value;
             }
-        });
+        }
+    });
+});
 
-        World.add(engine.world, [ground, block]);
-        engine.world.gravity.y = 1;
+document.getElementById('reset').addEventListener('click', createSimulation);
+</script>
 
-        Engine.run(engine);
-        Render.run(render);
-
-        document.getElementById('angle').addEventListener('input', (e) => {
-            Matter.Body.setAngle(ground, -Math.PI * e.target.value / 180);
-        });
-
-        document.getElementById('friction').addEventListener('input', (e) => {
-            block.friction = parseFloat(e.target.value);
-        });
-
-        document.getElementById('gravity').addEventListener('input', (e) => {
-            engine.world.gravity.y = parseFloat(e.target.value);
-        });
-    </script>
 </body>
 </html>

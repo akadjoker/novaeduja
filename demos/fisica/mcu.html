@@ -2,84 +2,125 @@
 <html>
 <head>
     <title>Movimento Circular Uniforme</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css">
     <style>
-        .controls {
-            position: fixed;
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: #000;
+        }
+        #controls {
+            position: absolute;
             top: 10px;
             left: 10px;
-            background: rgba(255,255,255,0.8);
+            width: 200px;
+            background: rgba(255, 255, 255, 0.1);
             padding: 10px;
             border-radius: 5px;
+            color: #fff;
         }
-        canvas { background: #f0f0f0; }
+        .info-label {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 5px;
+            color: #fff;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        canvas {
+            display: block;
+        }
     </style>
 </head>
 <body>
-    <div class="controls">
-        <label>Velocidade: <input type="range" id="speed" min="1" max="10" value="5"></label><br>
-        <label>Raio: <input type="range" id="radius" min="50" max="200" value="100"></label>
+    <div id="controls">
+        <label for="speed">Velocidade:</label>
+        <input type="range" id="speed" min="1" max="20" value="10" class="form-range">
+        <label for="radius">Raio:</label>
+        <input type="range" id="radius" min="50" max="300" value="150" class="form-range">
     </div>
-    <canvas id="canvas"></canvas>
+
+    <div class="info-label" id="info-label">
+        <p>Velocidade Angular: <span id="angular-speed">0.10 rad/s</span></p>
+        <p>Velocidade Linear: <span id="linear-speed">15.00 px/s</span></p>
+        <p>Raio: <span id="current-radius">150 px</span></p>
+    </div>
+
     <script>
-        const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d');
-        
-        canvas.width = 800;
-        canvas.height = 600;
-        
         let angle = 0;
-        let speed = 0.05;
-        let radius = 100;
+        let speed = 0.1;
+        let radius = 150;
         let trail = [];
-        
-        function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            // Centro
-            const centerX = canvas.width / 2;
-            const centerY = canvas.height / 2;
-            
-            // Trajetória
-            ctx.beginPath();
-            ctx.strokeStyle = '#ddd';
-            ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-            ctx.stroke();
-            
-            // Trilha
-            ctx.beginPath();
-            ctx.strokeStyle = 'rgba(74, 144, 226, 0.2)';
-            trail.forEach((pos, i) => {
-                if (i === 0) ctx.moveTo(pos.x, pos.y);
-                else ctx.lineTo(pos.x, pos.y);
-            });
-            ctx.stroke();
-            
-            // Objeto
-            const x = centerX + Math.cos(angle) * radius;
-            const y = centerY + Math.sin(angle) * radius;
-            
-            ctx.beginPath();
-            ctx.fillStyle = '#4a90e2';
-            ctx.arc(x, y, 10, 0, Math.PI * 2);
-            ctx.fill();
-            
-            trail.push({x, y});
-            if (trail.length > 50) trail.shift();
-            
-            angle += speed;
-            requestAnimationFrame(draw);
+
+        function setup() {
+            createCanvas(windowWidth, windowHeight * 0.95);
+            noFill();
         }
-        
+
+        function draw() {
+            background(0);
+
+            // Centro do círculo
+            const centerX = width / 2;
+            const centerY = height / 2;
+
+            // Desenhar a trajetória
+            stroke(150);
+            strokeWeight(1);
+            ellipse(centerX, centerY, radius * 2);
+
+            // Posição do objeto
+            const x = centerX + cos(angle) * radius;
+            const y = centerY + sin(angle) * radius;
+
+            // Adicionar à trilha
+            trail.push({ x, y });
+            if (trail.length > 50) trail.shift();
+
+            // Desenhar a trilha
+            stroke(74, 144, 226, 50);
+            strokeWeight(2);
+            beginShape();
+            for (let pos of trail) {
+                vertex(pos.x, pos.y);
+            }
+            endShape();
+
+            // Desenhar o objeto
+            fill(74, 144, 226);
+            noStroke();
+            ellipse(x, y, 20);
+
+            // Atualizar o ângulo
+            angle += speed;
+
+            // Atualizar informações na tela
+            const angularSpeed = speed.toFixed(2);
+            const linearSpeed = (speed * radius).toFixed(2);
+            document.getElementById('angular-speed').textContent = `${angularSpeed} rad/s`;
+            document.getElementById('linear-speed').textContent = `${linearSpeed} px/s`;
+            document.getElementById('current-radius').textContent = `${radius} px`;
+        }
+
+        function windowResized() {
+            resizeCanvas(windowWidth, windowHeight * 0.95);
+        }
+
+        // Controle da velocidade
         document.getElementById('speed').addEventListener('input', (e) => {
             speed = e.target.value * 0.01;
         });
-        
+
+        // Controle do raio
         document.getElementById('radius').addEventListener('input', (e) => {
             radius = parseInt(e.target.value);
-            trail = [];
+            trail = []; // Limpar trilha
         });
-        
-        draw();
     </script>
 </body>
 </html>

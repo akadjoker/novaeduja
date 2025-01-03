@@ -1,163 +1,181 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pêndulo Simples</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css">
     <style>
-        .controls {
-            position: fixed;
-            top: 10px;
-            left: 10px;
-            background: rgba(255,255,255,0.8);
-            padding: 10px;
-            border-radius: 5px;
-            z-index: 10;
-        }
-        .info {
-            position: fixed;
+        body { margin: 0; background: #000; overflow: hidden; color: white; font-family: Arial, sans-serif; }
+        #controls {
+            position: absolute;
             top: 10px;
             right: 10px;
-            background: rgba(255,255,255,0.8);
+            background: rgba(255, 255, 255, 0.1);
             padding: 10px;
             border-radius: 5px;
-            z-index: 10;
-            text-align: right;
-        }
-        canvas { background: #f0f0f0; }
-        button {
-            margin-top: 10px;
-            padding: 5px 10px;
-            background: #4a90e2;
             color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
+            z-index: 10;
         }
-        button:hover {
-            background: #357ab8;
-        }
+        canvas { display: block; }
     </style>
 </head>
 <body>
-    <div class="controls">
-        <label>Comprimento: <input type="range" id="length" min="100" max="300" value="200"></label><br>
-        <label>Gravidade: <input type="range" id="gravity" min="0" max="2" step="0.1" value="1"></label><br>
-        <label>Atrito: <input type="range" id="friction" min="0" max="0.05" step="0.01" value="0.01"></label><br>
-        <button id="reset">Reiniciar</button>
-    </div>
-
-    <div class="info">
-        <p><strong>Relações Matemáticas:</strong></p>
-        <p>Velocidade Linear (v): <span id="velocity">0</span> m/s</p>
-        <p>Velocidade Angular (ω): <span id="angularVelocity">0</span> rad/s</p>
-        <p>Raio (r): <span id="radius">200</span> m</p>
+    <div id="controls">
+        <label>Comprimento: <input type="range" id="length" min="100" max="300" value="200"> <span id="lengthValue">200</span>px</label><br>
+        <label>Gravidade: <input type="range" id="gravity" min="0.1" max="2" step="0.1" value="1"> <span id="gravityValue">1.0</span></label><br>
+        <label>Vento: <input type="range" id="wind" min="-1" max="1" step="0.1" value="0"> <span id="windValue">0</span></label><br>
+        <label>Atrito do Ar: <input type="range" id="frictionAir" min="0" max="0.1" step="0.01" value="0.01"> <span id="frictionAirValue">0.01</span></label><br>
+        <button id="reset" class="btn btn-sm btn-outline-light w-100 mt-1">Reiniciar</button>
     </div>
 
     <script>
-        const Engine = Matter.Engine,
-              Render = Matter.Render,
-              World = Matter.World,
-              Bodies = Matter.Bodies,
-              Constraint = Matter.Constraint,
-              Mouse = Matter.Mouse,
-              MouseConstraint = Matter.MouseConstraint;
+let engine, world, bob, constraint, anchor, mouseConstraint;
+let canvas;
+let isDragging = false;
+let windForce = 0;
 
-        const engine = Engine.create();
-        const render = Render.create({
-            element: document.body,
-            engine: engine,
-            options: {
-                width: window.innerWidth, // Dimensão inicial com base na janela
-                height: window.innerHeight, // Dimensão inicial com base na janela
-                wireframes: false
-            }
-        });
+function setup() {
+    canvas = createCanvas(windowWidth, windowHeight * 0.95);
 
-        let pendulumLength = 200;
-        const anchor = { x: window.innerWidth / 2, y: 100 };
-        const bob = Bodies.circle(window.innerWidth / 2, 300, 20, {
-            render: { fillStyle: '#4a90e2' },
-            frictionAir: 0.01
-        });
+    // Criar motor físico
+    engine = Matter.Engine.create();
+    world = engine.world;
 
-        let constraint = Constraint.create({
-            pointA: anchor,
-            bodyB: bob,
-            length: pendulumLength,
-            stiffness: 1
-        });
+    // Ponto fixo do pêndulo
+    anchor = { x: width / 2, y: 100 };
 
-        const mouse = Mouse.create(render.canvas);
-        const mouseConstraint = MouseConstraint.create(engine, {
-            mouse: mouse,
-            constraint: {
-                stiffness: 0.2,
-                render: {
-                    visible: false
-                }
-            }
-        });
+    // Criar o bob do pêndulo
+    bob = Matter.Bodies.circle(anchor.x, anchor.y + 200, 20, {
+        frictionAir: 0.01,
+        render: { fillStyle: '#4a90e2' }
+    });
 
-        World.add(engine.world, [bob, constraint, mouseConstraint]);
-        Engine.run(engine);
-        Render.run(render);
+    // Conexão do pêndulo
+    constraint = Matter.Constraint.create({
+        pointA: anchor,
+        bodyB: bob,
+        length: 200,
+        stiffness: 1
+    });
 
-        // Atualiza o comprimento do pêndulo
-        document.getElementById('length').addEventListener('input', (e) => {
-            World.remove(engine.world, constraint);
-            pendulumLength = parseInt(e.target.value);
-            document.getElementById('radius').textContent = pendulumLength;
-            constraint = Constraint.create({
-                pointA: anchor,
-                bodyB: bob,
-                length: pendulumLength,
-                stiffness: 1
-            });
-            World.add(engine.world, constraint);
-        });
+    // Configurar interatividade com mouse
+    const mouse = Matter.Mouse.create(canvas.elt);
+    mouse.pixelRatio = pixelDensity();
+    mouseConstraint = Matter.MouseConstraint.create(engine, {
+        mouse: mouse,
+        constraint: {
+            stiffness: 0.2,
+            render: { visible: false }
+        }
+    });
 
-        // Atualiza a gravidade
-        document.getElementById('gravity').addEventListener('input', (e) => {
-            engine.world.gravity.y = parseFloat(e.target.value);
-        });
+    Matter.World.add(world, mouseConstraint);
 
-        // Atualiza o atrito
-        document.getElementById('friction').addEventListener('input', (e) => {
-            bob.frictionAir = parseFloat(e.target.value);
-        });
+    // Eventos do mouse
+    Matter.Events.on(mouseConstraint, 'mousedown', function(event) {
+        if (mouseConstraint.body === bob) {
+            isDragging = true;
+        }
+    });
 
-        // Reinicia a posição do pêndulo
-        document.getElementById('reset').addEventListener('click', () => {
-            Matter.Body.setPosition(bob, { x: window.innerWidth / 2, y: 300 });
-            Matter.Body.setVelocity(bob, { x: 0, y: 0 });
-        });
+    Matter.Events.on(mouseConstraint, 'mouseup', function(event) {
+        isDragging = false;
+    });
 
-        // Função para redimensionar o canvas com base na janela
-        const resizeCanvas = () => {
-            render.canvas.width = window.innerWidth;
-            render.canvas.height = window.innerHeight;
-            render.options.width = window.innerWidth;
-            render.options.height = window.innerHeight;
+    // Adicionar objetos ao mundo
+    Matter.World.add(world, [bob, constraint]);
+    Matter.Engine.run(engine);
+}
 
-            // Reposiciona o pêndulo com base no novo tamanho da janela
-            anchor.x = window.innerWidth / 2;
-            Matter.Body.setPosition(bob, { x: window.innerWidth / 2, y: 300 });
-        };
+let trail = [];
 
-        // Listener para redimensionamento da janela
-        window.addEventListener('resize', resizeCanvas);
+function draw() {
+    background(0);
+    drawPendulum();
 
-        // Atualizar as relações matemáticas
-        setInterval(() => {
-            const velocityX = bob.velocity.x;
-            const velocityY = bob.velocity.y;
-            const angularVelocity = bob.angularVelocity;
-            const velocityLinear = Math.sqrt(velocityX ** 2 + velocityY ** 2);
+    if (isDragging) {
+        push();
+        stroke('#4fc3f7');
+        strokeWeight(2);
+        noFill();
+        line(bob.position.x, bob.position.y, mouseX, mouseY);
+        pop();
+    }
 
-            document.getElementById('velocity').textContent = velocityLinear.toFixed(2);
-            document.getElementById('angularVelocity').textContent = angularVelocity.toFixed(2);
-        }, 100);
+    // Aplicar vento ao bob
+    Matter.Body.applyForce(bob, bob.position, { x: windForce, y: 0 });
+    push();
+    fill(255);
+    textAlign(CENTER);
+    textSize(16);
+    text("Arrasta o pêndulo com o rato!", width / 2, height - 150);
+    pop();
+
+    trail.push({ x: bob.position.x, y: bob.position.y });
+    if (trail.length > 50) trail.shift();
+
+    for (let i = 0; i < trail.length; i++) {
+        fill(255, map(i, 0, trail.length, 50, 255));
+        noStroke();
+        ellipse(trail[i].x, trail[i].y, 5);
+    }
+}
+
+function drawPendulum() {
+    // Desenhar ponto fixo
+    fill(255);
+    noStroke();
+    ellipse(anchor.x, anchor.y, 10);
+
+    // Desenhar linha do pêndulo
+    stroke(255);
+    strokeWeight(2);
+    line(anchor.x, anchor.y, bob.position.x, bob.position.y);
+
+    // Desenhar bob do pêndulo
+    fill(isDragging ? '#29b6f6' : '#4a90e2');
+    noStroke();
+    ellipse(bob.position.x, bob.position.y, 40);
+}
+
+// Atualizar comprimento do pêndulo
+document.getElementById('length').addEventListener('input', (e) => {
+    constraint.length = parseInt(e.target.value);
+    document.getElementById('lengthValue').textContent = e.target.value;
+});
+
+// Atualizar gravidade
+document.getElementById('gravity').addEventListener('input', (e) => {
+    engine.world.gravity.y = parseFloat(e.target.value);
+    document.getElementById('gravityValue').textContent = e.target.value;
+});
+
+// Atualizar vento
+document.getElementById('wind').addEventListener('input', (e) => {
+    windForce = parseFloat(e.target.value)/100.0;
+    document.getElementById('windValue').textContent = e.target.value;
+});
+
+// Atualizar atrito do ar
+document.getElementById('frictionAir').addEventListener('input', (e) => {
+    bob.frictionAir = parseFloat(e.target.value);
+    document.getElementById('frictionAirValue').textContent = e.target.value;
+});
+
+// Reiniciar o pêndulo
+document.getElementById('reset').addEventListener('click', () => {
+    Matter.Body.setPosition(bob, { x: anchor.x, y: anchor.y + constraint.length });
+    Matter.Body.setVelocity(bob, { x: 0, y: 0 });
+});
+
+function windowResized() {
+    resizeCanvas(windowWidth, windowHeight * 0.95);
+    anchor.x = width / 2;
+    constraint.pointA = anchor;
+}
     </script>
 </body>
 </html>
-
