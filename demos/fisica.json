@@ -32,6 +32,13 @@
       "screenshot": "demos/screenshots/mola.webp",
       "arquivo": "demos/fisica/mola.html",
       "descricao": "Explore o comportamento oscilatório de uma mola ajustando constante elástica e massa."
+    },
+    {
+      "id": "lancamento",
+      "titulo": "Lançamento Oblíquo",
+      "screenshot": "demos/screenshots/lancamento.webp",
+      "arquivo": "demos/fisica/lancamento.html",
+      "descricao": "Simulação de lançamento oblíquo com controle de ângulo e velocidade inicial"
     }
     
   ]
