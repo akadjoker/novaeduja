@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mola Realista com p5.js</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: #000;
+        }
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+<script>
+    let start, end;
+
+    function setup() {
+        createCanvas(windowWidth, windowHeight);
+        start = createVector(width / 2, height / 4);
+        end = createVector(width / 2, (3 * height) / 4);
+    }
+
+    function draw() {
+        background(0);
+
+        // Desenhar mola
+        drawSpring(start, end, 20, 10, 4);
+
+        // Desenhar os pontos fixos
+        fill(255);
+        noStroke();
+        ellipse(start.x, start.y, 10);
+        ellipse(end.x, end.y, 10);
+    }
+
+    function drawSpring(start, end, coils, coilWidth, lineWidth) {
+        stroke(255);
+        strokeWeight(lineWidth);
+        noFill();
+
+        beginShape();
+        let delta = p5.Vector.sub(end, start);
+        let normal = createVector(-delta.y, delta.x).normalize();
+        let coilLength = delta.mag() / coils;
+
+        for (let i = 0; i <= coils; i++) {
+            let t = i / coils;
+            let offset = i % 2 === 0 ? 1 : -1;
+            let pos = p5.Vector.lerp(start, end, t);
+
+            if (i > 0 && i < coils) {
+                pos.add(p5.Vector.mult(normal, offset * coilWidth));
+            }
+
+            vertex(pos.x, pos.y);
+        }
+
+        endShape();
+    }
+
+    function mouseDragged() {
+        // Permitir que o ponto final seja movido com o mouse
+        end.x = mouseX;
+        end.y = mouseY;
+    }
+
+    function windowResized() {
+        resizeCanvas(windowWidth, windowHeight);
+        start = createVector(width / 2, height / 4);
+        end = createVector(width / 2, (3 * height) / 4);
+    }
+</script>
+</body>
+</html>
+

@@ -9,7 +9,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css">
     <style>
-       body { background: #000; margin: 0; overflow: hidden; height: 95%; }
+        body {
+            background: #000;
+            margin: 0;
+            overflow: hidden;
+            height: 95%;
+        }
 
         #controls {
             position: absolute;
@@ -30,12 +35,41 @@
 
 <body>
     <div id="controls">
-        <input type="range" id="stiffness" min="0.1" max="1" step="0.1" value="0.5" class="form-range mb-1">
-        <small>Rigidez: <span id="stiffnessValue">0.5</span></small>
+        <input type="range" id="stiffness" min="0.0" max="100" step="0.1" value="0.1" class="form-range mb-1">
+        <small>Rigidez: <span id="stiffnessValue">1</span></small>
         <input type="range" id="length" min="100" max="300" step="10" value="200" class="form-range mb-1">
         <small>Comprimento: <span id="lengthValue">200</span> px</small>
         <button id="reset" class="btn btn-sm btn-outline-light w-100 mt-1">Reiniciar</button>
     </div>
+    <div id="info" style="position: absolute; top: 20px; left: 20px; color: #fff;">
+        <p>Energia Potencial: <span id="energy">0</span> J</p>
+        <p>Força Restauradora: <span id="force">0</span> N</p>
+        <p>Posição (x): <span id="position">0</span> px</p>
+        <p>Velocidade (v): <span id="velocity">0</span> px/s</p>
+        <p>Aceleração (a): <span id="acceleration">0</span> px/s²</p>
+    </div>
+    <div id="info-overlay">
+        <img src="mola.jpg" alt="Fórmulas da mola" id="background-info">
+    </div>
+    <style>
+        #info-overlay {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            width: 400px; 
+            opacity: 0.5; 
+        }
+        #info-overlay:hover {
+        opacity: 1.0; /* Transparência máxima ao passar o mouse */
+    }
+    
+        #background-info {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+    
+    
 
     <script>
         let engine, world, ground, anchor, mass, spring, block, boundaries;
@@ -75,7 +109,7 @@
             });
 
             // Massa conectada à mola
-            mass = Matter.Bodies.circle(width / 2, 300, 20, {
+            mass = Matter.Bodies.rectangle(width / 2, 300, 40, 40, {
                 restitution: 0.9,
                 frictionAir: 0.02,
                 render: { fillStyle: '#f04a49' }
@@ -86,7 +120,7 @@
                 bodyA: anchor,
                 bodyB: mass,
                 length: 200, // Comprimento inicial da mola
-                stiffness: 0.5, // Rigidez inicial
+                stiffness: 0.001, // Rigidez inicial
             });
 
             // Limites da cena
@@ -112,7 +146,7 @@
             // Bloco interativo
             block = Matter.Bodies.rectangle(width / 2 - 200, height - 300, 40, 40, {
                 restitution: 0.9,
-                frictionAir: 0.01,
+                stiffness: 0.5,
                 render: { fillStyle: '#29b6f6' }
             });
 
@@ -124,17 +158,22 @@
         function draw() {
             background(0);
 
-            drawRealisticSpring(anchor.position, mass.position);
+            updateLabels();
+
+            //drawRealisticSpring(anchor.position, mass.position);
+            start = createVector(anchor.position.x, anchor.position.y);
+            end = createVector(mass.position.x, mass.position.y);
+            drawSpring(start, end, 20, 5, 2);
 
             // Desenhar âncora
             fill('#4fc3f7');
             noStroke();
-            ellipse(anchor.position.x, anchor.position.y, 20);
+            ellipse(anchor.position.x, anchor.position.y, 8);
 
             // Desenhar massa
             fill('#f04a49');
             noStroke();
-            ellipse(mass.position.x, mass.position.y, 40);
+            rect(mass.position.x, mass.position.y, 40, 40);
 
             // Desenhar bloco
             fill('#29b6f6');
@@ -162,9 +201,33 @@
             endShape();
         }
 
+        function drawSpring(start, end, coils, coilWidth, lineWidth) {
+            stroke(255);
+            strokeWeight(lineWidth);
+            noFill();
+
+            beginShape();
+            let delta = p5.Vector.sub(end, start);
+            let normal = createVector(-delta.y, delta.x).normalize();
+            let coilLength = delta.mag() / coils;
+
+            for (let i = 0; i <= coils; i++) {
+                let t = i / coils;
+                let offset = i % 2 === 0 ? 1 : -1;
+                let pos = p5.Vector.lerp(start, end, t);
+
+                if (i > 0 && i < coils) {
+                    pos.add(p5.Vector.mult(normal, offset * coilWidth));
+                }
+
+                vertex(pos.x, pos.y);
+            }
+
+            endShape();
+        }
         // Atualizar sliders
         document.getElementById('stiffness').addEventListener('input', (e) => {
-            spring.stiffness = parseFloat(e.target.value);
+            spring.stiffness = parseFloat(e.target.value) / 1000.0;
             document.getElementById('stiffnessValue').textContent = e.target.value;
         });
 
@@ -177,6 +240,20 @@
         document.getElementById('reset').addEventListener('click', () => {
             createSimulation();
         });
+
+        function updateLabels() {
+            const deltaX = dist(anchor.position.x, anchor.position.y, mass.position.x, mass.position.y) - spring.length;
+            const force = -spring.stiffness * deltaX;
+            const velocity = dist(0, 0, mass.velocity.x, mass.velocity.y);
+            const acceleration = force / mass.mass; // Considerando massa da entidade
+
+            document.getElementById('energy').textContent = (0.5 * spring.stiffness * deltaX ** 2).toFixed(2);
+            document.getElementById('force').textContent = force.toFixed(2);
+            document.getElementById('position').textContent = deltaX.toFixed(2);
+            document.getElementById('velocity').textContent = velocity.toFixed(2);
+            document.getElementById('acceleration').textContent = acceleration.toFixed(2);
+        }
+
 
         // Ajustar tamanho ao redimensionar a janela
         function windowResized() {
