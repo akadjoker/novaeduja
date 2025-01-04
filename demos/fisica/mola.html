@@ -48,9 +48,9 @@
         <p>Velocidade (v): <span id="velocity">0</span> px/s</p>
         <p>Aceleração (a): <span id="acceleration">0</span> px/s²</p>
     </div>
-    <!-- <div id="info-overlay">
+    <div id="info-overlay">
         <img src="mola.jpg" alt="Fórmulas da mola" id="background-info">
-    </div> -->
+    </div>
     <style>
         #info-overlay {
             position: absolute;
@@ -125,9 +125,9 @@
 
             // Limites da cena
             const boundaries = [
-                Matter.Bodies.rectangle(width / 2, height-100, width, 20, {
+                Matter.Bodies.rectangle(width / 2, height, width, 20, {
                     isStatic: true,
-                    render: { visible: true }
+                    render: { visible: false }
                 }),
                 Matter.Bodies.rectangle(0, height / 2, 20, height, {
                     isStatic: true,
