@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explorador de Derivadas</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .function-select {
+            width: 200px;
+        }
+        #chartContainer {
+            position: relative;
+            height: 400px;
+            width: 100%;
+            max-width: 800px;
+            margin: 20px auto;
+        }
+        .slider-container {
+            width: 100%;
+            max-width: 800px;
+            margin: 20px auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <h2 class="text-center mb-4">Explorador de Derivadas</h2>
+        
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Função</h5>
+                        <select id="functionSelect" class="form-select function-select mb-3">
+                            <option value="quadratic">f(x) = x²</option>
+                            <option value="cubic">f(x) = x³</option>
+                            <option value="sin">f(x) = sin(x)</option>
+                            <option value="cos">f(x) = cos(x)</option>
+                            <option value="exp">f(x) = e^x</option>
+                        </select>
+                        
+                        <div id="derivativeInfo" class="mt-3">
+                            <p>Derivada: <span id="derivativeFormula">f'(x) = 2x</span></p>
+                            <p>Ponto x = <span id="currentX">0</span></p>
+                            <p>f(x) = <span id="currentY">0</span></p>
+                            <p>f'(x) = <span id="currentDerivative">0</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Controles</h5>
+                        <label for="xSlider" class="form-label">Ponto x:</label>
+                        <input type="range" class="form-range" id="xSlider" min="-5" max="5" step="0.1" value="0">
+                        
+                        <label for="tangentLength" class="form-label mt-3">Comprimento da Tangente:</label>
+                        <input type="range" class="form-range" id="tangentLength" min="0.5" max="3" step="0.1" value="1">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="chartContainer">
+            <canvas id="derivativeChart"></canvas>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+    
+    <script>
+        const functions = {
+            quadratic: {
+                f: x => x * x,
+                derivative: x => 2 * x,
+                formula: "f(x) = x²",
+                derivativeFormula: "f'(x) = 2x"
+            },
+            cubic: {
+                f: x => x * x * x,
+                derivative: x => 3 * x * x,
+                formula: "f(x) = x³",
+                derivativeFormula: "f'(x) = 3x²"
+            },
+            sin: {
+                f: x => Math.sin(x),
+                derivative: x => Math.cos(x),
+                formula: "f(x) = sin(x)",
+                derivativeFormula: "f'(x) = cos(x)"
+            },
+            cos: {
+                f: x => Math.cos(x),
+                derivative: x => -Math.sin(x),
+                formula: "f(x) = cos(x)",
+                derivativeFormula: "f'(x) = -sin(x)"
+            },
+            exp: {
+                f: x => Math.exp(x),
+                derivative: x => Math.exp(x),
+                formula: "f(x) = e^x",
+                derivativeFormula: "f'(x) = e^x"
+            }
+        };
+
+        let chart;
+        let currentFunction = functions.quadratic;
+        
+        function generatePoints(func, start, end, steps) {
+            const points = [];
+            const step = (end - start) / steps;
+            for (let x = start; x <= end; x += step) {
+                points.push({x: x, y: func(x)});
+            }
+            return points;
+        }
+
+        function getTangentLine(x0, func, derivative, length) {
+            const y0 = func(x0);
+            const slope = derivative(x0);
+            return [
+                {x: x0 - length, y: y0 - slope * length},
+                {x: x0 + length, y: y0 + slope * length}
+            ];
+        }
+
+        function updateChart() {
+            const x0 = parseFloat($('#xSlider').val());
+            const tangentLength = parseFloat($('#tangentLength').val());
+            
+            const functionPoints = generatePoints(currentFunction.f, -5, 5, 200);
+            const tangentPoints = getTangentLine(x0, currentFunction.f, currentFunction.derivative, tangentLength);
+
+            chart.data.datasets[0].data = functionPoints;
+            chart.data.datasets[1].data = tangentPoints;
+            chart.update();
+
+            // Atualizar informações
+            $('#currentX').text(x0.toFixed(2));
+            $('#currentY').text(currentFunction.f(x0).toFixed(2));
+            $('#currentDerivative').text(currentFunction.derivative(x0).toFixed(2));
+        }
+
+        $(document).ready(function() {
+            const ctx = document.getElementById('derivativeChart').getContext('2d');
+            chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    datasets: [{
+                        label: 'Função',
+                        borderColor: 'blue',
+                        borderWidth: 2,
+                        fill: false,
+                        pointRadius: 0
+                    }, {
+                        label: 'Reta Tangente',
+                        borderColor: 'red',
+                        borderWidth: 2,
+                        fill: false,
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            position: 'center',
+                            min: -5,
+                            max: 5
+                        },
+                        y: {
+                            type: 'linear',
+                            position: 'center',
+                            min: -5,
+                            max: 5
+                        }
+                    }
+                }
+            });
+
+            $('#functionSelect').change(function() {
+                currentFunction = functions[$(this).val()];
+                $('#derivativeFormula').text(currentFunction.derivativeFormula);
+                updateChart();
+            });
+
+            $('#xSlider, #tangentLength').on('input', updateChart);
+
+            updateChart();
+        });
+    </script>
+</body>
+</html>

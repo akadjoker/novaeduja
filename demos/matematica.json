@@ -70,19 +70,27 @@
       "descricao": "Explora progressões aritméticas e geométricas com gráficos e cálculos interativos."
     },
     {
-      "id": "visualizador_maximos_minimos",
-      "titulo": "Visualizador de Máximos e Mínimos",
+      "id": "simulador_otimizacao",
+      "titulo": "Simulador de Otimização",
       "screenshot": "demos/matematica/screenshots/maxmin.jpg",
       "arquivo": "demos/matematica/maxmin.html",
-      "descricao": "Explora os máximos e mínimos de uma função matemática."
+      "descricao": "Maximiza a área mantendo o perímetro fixo. Visualiza e explore formas geométricas como retângulos, triângulos e círculos."
     },
+    
     {
       "id": "jogo_lucro_maximo",
       "titulo": "Jogo do Lucro Máximo",
       "screenshot": "demos/matematica/screenshots/lucromaximo.jpg",
       "arquivo": "demos/matematica/lucromaximo.html",
       "descricao": "Descobre o preço ótimo para maximizar o lucro com base no custo e demanda."
+    },    {
+      "id": "explorador_derivadas",
+      "titulo": "Explorador de Derivadas",
+      "screenshot": "demos/matematica/screenshots/derivadas.jpg",
+      "arquivo": "demos/matematica/derivadas.html",
+      "descricao": "Visualiza derivadas e tangentes interativas para funções matemáticas."
     }
+    
     
     
     
