@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Circuitos Elétricos</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .circuit-container {
+            background: #f8f9fa;
+            border-radius: 8px;
+            height: 500px;
+            position: relative;
+            border: 1px solid #ddd;
+        }
+
+        .circuit-component {
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            text-align: center;
+            padding: 10px;
+            font-size: 14px;
+            cursor: pointer;
+            position: absolute;
+        }
+
+        .component-panel {
+            background: #fff;
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .measurements {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .measurement-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #2196f3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <h2 class="text-center mb-4">Simulador de Circuitos Elétricos</h2>
+        <div class="row">
+            <div class="col-md-3">
+                <div class="component-panel">
+                    <h5 class="mb-3">Componentes</h5>
+                    <button class="btn btn-primary w-100 mb-2" id="addBattery">Adicionar Bateria</button>
+                    <button class="btn btn-primary w-100 mb-2" id="addResistor">Adicionar Resistor</button>
+                    <button class="btn btn-danger w-100" id="clearCircuit">Limpar Circuito</button>
+                </div>
+
+                <div class="measurements">
+                    <h6>Medições</h6>
+                    <p>Corrente: <span id="currentValue" class="measurement-value">0.00 A</span></p>
+                    <p>Resistência Total: <span id="totalResistance" class="measurement-value">0.00 Ω</span></p>
+                    <p>Potência: <span id="powerValue" class="measurement-value">0.00 W</span></p>
+                </div>
+            </div>
+
+            <div class="col-md-9">
+                <div class="circuit-container" id="circuit-canvas"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsplumb/2.15.6/js/jsplumb.min.js"></script>
+    <script>
+        const jsPlumbInstance = jsPlumb.getInstance({
+            Container: 'circuit-canvas',
+            Connector: ['Flowchart', { cornerRadius: 5 }],
+            Endpoint: ['Dot', { radius: 5 }],
+            EndpointStyle: { fill: '#2196f3' },
+            PaintStyle: { stroke: '#2196f3', strokeWidth: 2 },
+            ConnectionOverlays: [['Arrow', { width: 10, length: 10, location: 1 }]],
+        });
+
+        const components = [];
+        let nextId = 1;
+
+        function addComponent(type) {
+            const id = `component-${nextId++}`;
+            const div = document.createElement('div');
+            div.id = id;
+            div.className = 'circuit-component';
+            div.style.left = '100px';
+            div.style.top = `${nextId * 50}px`;
+            div.textContent = type === 'battery' ? 'Bateria (12V)' : 'Resistor (100Ω)';
+            document.getElementById('circuit-canvas').appendChild(div);
+
+            jsPlumbInstance.draggable(div);
+            jsPlumbInstance.makeSource(div, {
+                anchor: 'Continuous',
+                maxConnections: 1,
+            });
+            jsPlumbInstance.makeTarget(div, {
+                anchor: 'Continuous',
+                maxConnections: 1,
+            });
+
+            components.push({ id, type, resistance: type === 'resistor' ? 100 : 0 });
+        }
+
+        function calculateCircuit() {
+            const battery = components.find(comp => comp.type === 'battery');
+            const resistors = components.filter(comp => comp.type === 'resistor');
+            const connections = jsPlumbInstance.getConnections();
+
+            if (!battery || resistors.length === 0 || connections.length === 0) {
+                document.getElementById('currentValue').textContent = '0.00 A';
+                document.getElementById('totalResistance').textContent = '0.00 Ω';
+                document.getElementById('powerValue').textContent = '0.00 W';
+                return;
+            }
+
+            const totalResistance = resistors.reduce((sum, r) => sum + r.resistance, 0);
+            const voltage = 12;
+            const current = voltage / totalResistance;
+            const power = voltage * current;
+
+            document.getElementById('currentValue').textContent = `${current.toFixed(2)} A`;
+            document.getElementById('totalResistance').textContent = `${totalResistance.toFixed(2)} Ω`;
+            document.getElementById('powerValue').textContent = `${power.toFixed(2)} W`;
+        }
+
+        document.getElementById('addBattery').addEventListener('click', () => addComponent('battery'));
+        document.getElementById('addResistor').addEventListener('click', () => addComponent('resistor'));
+
+        document.getElementById('clearCircuit').addEventListener('click', () => {
+            jsPlumbInstance.deleteEveryEndpoint();
+            document.getElementById('circuit-canvas').innerHTML = '';
+            components.length = 0;
+            calculateCircuit();
+        });
+
+        jsPlumbInstance.bind('connection', () => calculateCircuit());
+        jsPlumbInstance.bind('connectionDetached', () => calculateCircuit());
+
+        jsPlumbInstance.ready(() => console.log('Simulador pronto!'));
+    </script>
+</body>
+</html>

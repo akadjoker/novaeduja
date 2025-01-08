@@ -89,7 +89,15 @@
       "screenshot": "demos/matematica/screenshots/derivadas.jpg",
       "arquivo": "demos/matematica/derivadas.html",
       "descricao": "Visualiza derivadas e tangentes interativas para funções matemáticas."
-    }
+    },
+    {
+      "id": "circuitos_basicos",
+      "titulo": "Simulador de Circuito Básico",
+      "screenshot": "demos/matematica/screenshots/circuitos_basicos.jpg",
+      "arquivo": "demos/matematica/circuitos_basicos.html",
+      "descricao": "Experimenta circuitos elétricos simples com componentes como bateria, resistor e LED. Visualiza a corrente, potência e brilho do LED em tempo real."
+  }
+  
     
     
     

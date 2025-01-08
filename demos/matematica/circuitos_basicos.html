@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Circuitos Básico</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .circuit-board {
+            background: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            position: relative;
+            height: 400px;
+            margin-bottom: 20px;
+        }
+        .component {
+            position: absolute;
+            background: white;
+            padding: 10px;
+            border: 2px solid #6c757d;
+            border-radius: 5px;
+            cursor: pointer;
+            user-select: none;
+            text-align: center;
+        }
+        .battery {
+            background: #e3f2fd;
+            border-color: #2196f3;
+        }
+        .resistor {
+            background: #fff3e0;
+            border-color: #ff9800;
+        }
+        .led {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #eee;
+            border: 2px solid #666;
+            transition: all 0.3s;
+        }
+        .led.on {
+            background: #e22424;
+            box-shadow: 0 0 20px #eb0202;
+        }
+        .wire {
+            position: absolute;
+            background: #666;
+            transform-origin: left center;
+        }
+        .controls {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .measurement {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2196f3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <h2 class="text-center">Circuito Série Simples</h2>
+        <p class="text-center lead">Experimente com tensão e resistência para ver como o LED responde</p>
+
+        <div class="row">
+            <div class="col-md-8">
+                <div class="circuit-board" id="circuitBoard">
+                    <div class="component battery" id="battery" style="top: 150px; left: 50px;">
+                        Bateria
+                        <div id="batteryVoltage">12V</div>
+                    </div>
+                    <div class="component resistor" id="resistor" style="top: 150px; left: 250px;">
+                        Resistor
+                        <div id="resistorValue">100Ω</div>
+                    </div>
+                    <div class="led" id="led" style="top: 150px; left: 450px;"></div>
+
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="controls">
+                    <h5 class="mb-3">Controles</h5>
+                    <div class="mb-4">
+                        <label class="form-label">Tensão da Bateria (V)</label>
+                        <input type="range" class="form-range" id="voltageControl" min="0" max="24" step="0.1" value="12">
+                        <div class="text-center" id="voltageDisplay">12V</div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Resistência (Ω)</label>
+                        <input type="range" class="form-range" id="resistanceControl" min="10" max="1000" step="10" value="100">
+                        <div class="text-center" id="resistanceDisplay">100Ω</div>
+                    </div>
+                    <hr>
+                    <div class="mb-2">
+                        Corrente no Circuito:
+                        <div class="measurement" id="currentDisplay">0.12A</div>
+                    </div>
+                    <div class="mb-2">
+                        Tensão no LED:
+                        <div class="measurement" id="ledVoltageDisplay">2.0V</div>
+                    </div>
+                    <div>
+                        Potência no LED:
+                        <div class="measurement" id="ledPowerDisplay">0.24W</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const LED_FORWARD_VOLTAGE = 2.0; // Tensão típica de LED
+        const LED_MAX_CURRENT = 0.02; // 20mA máximo
+        const voltageControl = document.getElementById('voltageControl');
+        const resistanceControl = document.getElementById('resistanceControl');
+        const led = document.getElementById('led');
+
+        function updateCircuit() {
+            const voltage = parseFloat(voltageControl.value);
+            const resistance = parseFloat(resistanceControl.value);
+
+            let current = (voltage - LED_FORWARD_VOLTAGE) / resistance;
+            current = Math.max(0, Math.min(current, LED_MAX_CURRENT));
+
+            document.getElementById('voltageDisplay').textContent = `${voltage.toFixed(1)}V`;
+            document.getElementById('resistanceDisplay').textContent = `${resistance}Ω`;
+            document.getElementById('currentDisplay').textContent = `${(current * 1000).toFixed(1)}mA`;
+            document.getElementById('ledVoltageDisplay').textContent = `${LED_FORWARD_VOLTAGE.toFixed(1)}V`;
+            document.getElementById('ledPowerDisplay').textContent = `${(LED_FORWARD_VOLTAGE * current).toFixed(2)}W`;
+
+            document.getElementById('batteryVoltage').textContent = `${voltage.toFixed(1)}V`;
+            document.getElementById('resistorValue').textContent = `${resistance}Ω`;
+
+            const brightness = Math.min(current / LED_MAX_CURRENT, 1);
+            if (brightness > 0.1) {
+                led.classList.add('on');
+                led.style.boxShadow = `0 0 ${20 * brightness}px rgba(255, 0, 0, ${brightness})`;
+            } else {
+                led.classList.remove('on');
+                led.style.boxShadow = 'none';
+            }
+            drawWires();
+        }
+
+
+
+        voltageControl.addEventListener('input', updateCircuit);
+        resistanceControl.addEventListener('input', updateCircuit);
+
+        updateCircuit();
+    </script>
+</body>
+</html>
