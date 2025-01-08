@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualizador de Máximos e Mínimos</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.8.0/math.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container my-5">
+    <div class="card shadow">
+        <div class="card-body">
+            <h2 class="card-title text-center">Visualizador de Máximos e Mínimos</h2>
+            <div class="mb-4">
+                <label for="functionInput" class="form-label">Digita uma função (ex: x^3 - 3x^2 + 2):</label>
+                <input id="functionInput" type="text" class="form-control" placeholder="Digita uma função matemática">
+            </div>
+            <div class="mb-4">
+                <button id="plotButton" class="btn btn-primary w-100">Plotar Gráfico</button>
+            </div>
+            <div class="mt-4">
+                <canvas id="functionChart" height="100"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const ctx = document.getElementById('functionChart').getContext('2d');
+    let chart;
+
+    const findExtrema = (fn, derivative, xRange) => {
+        const extrema = [];
+        for (let x = xRange[0]; x <= xRange[1]; x += 0.1) {
+            const slope = derivative(x);
+            const slopeNext = derivative(x + 0.1);
+
+            if (Math.sign(slope) !== Math.sign(slopeNext)) {
+                extrema.push({ x: x.toFixed(2), y: fn(x).toFixed(2) });
+            }
+        }
+        return extrema;
+    };
+
+    const plotGraph = () => {
+        const input = document.getElementById('functionInput').value;
+        if (!input) {
+            alert('Por favor, insere uma função.');
+            return;
+        }
+
+        const fn = math.compile(input);
+        const derivative = math.derivative(input, 'x').compile();
+        const xRange = [-10, 10];
+        const points = [];
+        const extremaPoints = findExtrema(x => fn.evaluate({ x }), x => derivative.evaluate({ x }), xRange);
+
+        for (let x = xRange[0]; x <= xRange[1]; x += 0.1) {
+            points.push({ x: x, y: fn.evaluate({ x }) });
+        }
+
+        const data = {
+            labels: points.map(p => p.x.toFixed(1)),
+            datasets: [
+                {
+                    label: 'Função',
+                    data: points.map(p => p.y),
+                    borderColor: '#007bff',
+                    fill: false,
+                    tension: 0.1
+                },
+                {
+                    label: 'Extremos',
+                    data: extremaPoints.map(p => p.y),
+                    borderColor: '#ff0000',
+                    backgroundColor: '#ff0000',
+                    pointRadius: 5,
+                    pointHoverRadius: 7,
+                    showLine: false
+                }
+            ]
+        };
+
+        if (chart) chart.destroy();
+        chart = new Chart(ctx, {
+            type: 'line',
+            data: data,
+            options: {
+                responsive: true,
+                scales: {
+                    x: { title: { display: true, text: 'x' } },
+                    y: { title: { display: true, text: 'f(x)' } }
+                }
+            }
+        });
+    };
+
+    document.getElementById('plotButton').addEventListener('click', plotGraph);
+</script>
+
+</body>
+</html>

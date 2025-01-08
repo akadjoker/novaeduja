@@ -68,9 +68,21 @@
       "screenshot": "demos/matematica/screenshots/sequence_explorer.jpg",
       "arquivo": "demos/matematica/sequence_explorer.html",
       "descricao": "Explora progressões aritméticas e geométricas com gráficos e cálculos interativos."
+    },
+    {
+      "id": "visualizador_maximos_minimos",
+      "titulo": "Visualizador de Máximos e Mínimos",
+      "screenshot": "demos/matematica/screenshots/maxmin.jpg",
+      "arquivo": "demos/matematica/maxmin.html",
+      "descricao": "Explora os máximos e mínimos de uma função matemática."
+    },
+    {
+      "id": "jogo_lucro_maximo",
+      "titulo": "Jogo do Lucro Máximo",
+      "screenshot": "demos/matematica/screenshots/lucromaximo.jpg",
+      "arquivo": "demos/matematica/lucromaximo.html",
+      "descricao": "Descobre o preço ótimo para maximizar o lucro com base no custo e demanda."
     }
-    
-    
     
     
     

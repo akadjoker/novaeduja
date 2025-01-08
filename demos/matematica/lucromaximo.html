@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo do Lucro Máximo</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+        }
+        .card {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container my-5">
+    <div class="card shadow">
+        <div class="card-body">
+            <h2 class="card-title text-center">Jogo do Lucro Máximo</h2>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label for="price" class="form-label">Preço por unidade (€): <span id="priceValue">10</span></label>
+                        <input type="range" class="form-range" id="price" min="1" max="20" value="10">
+                    </div>
+                    <div class="mb-3">
+                        <label for="cost" class="form-label">Custo por unidade (€): <span id="costValue">5</span></label>
+                        <input type="range" class="form-range" id="cost" min="1" max="10" value="5">
+                    </div>
+                    <div class="p-3 bg-light rounded">
+                        <h5>Resultados</h5>
+                        <p>Demanda: <span id="demand">50</span> unidades</p>
+                        <p>Lucro Total: <span id="profit">250</span> €</p>
+                    </div>
+
+                   
+
+                </div>
+                <div class="col-md-8">
+                    <canvas id="profitChart" height="150"></canvas>
+                </div>
+
+                <div class="p-3 bg-light rounded">
+                
+                <h5>Cálculo de demanda e lucro: Baseado na fórmula </h5>
+                <div class="p-3 bg-light rounded"> 
+                      Demanda = max(100−(Preço − Custo) × 10,0) e Lucro Total=(Preço − Custo) × Demanda 
+                </div>
+                </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const priceSlider = $("#price");
+    const costSlider = $("#cost");
+    const priceValue = $("#priceValue");
+    const costValue = $("#costValue");
+    const demandElement = $("#demand");
+    const profitElement = $("#profit");
+    const ctx = document.getElementById('profitChart').getContext('2d');
+
+    let profitChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: Array.from({ length: 20 }, (_, i) => i + 1), // Preços de 1 a 20
+            datasets: [{
+                label: 'Lucro Total (€)',
+                data: [],
+                borderColor: '#007bff',
+                fill: false
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                x: { title: { display: true, text: 'Preço (€)' } },
+                y: { title: { display: true, text: 'Lucro (€)' } }
+            }
+        }
+    });
+
+    const calculateDemand = (price, cost) => {
+        return Math.max(100 - (price - cost) * 10, 0);
+    };
+
+    const updateChart = (cost) => {
+        const profits = [];
+        for (let price = 1; price <= 20; price++) {
+            const demand = calculateDemand(price, cost);
+            const profit = (price - cost) * demand;
+            profits.push(profit);
+        }
+        profitChart.data.datasets[0].data = profits;
+        profitChart.update();
+    };
+
+    const updateUI = () => {
+        const price = parseFloat(priceSlider.val());
+        const cost = parseFloat(costSlider.val());
+
+        const demand = calculateDemand(price, cost);
+        const profit = (price - cost) * demand;
+
+        priceValue.text(price);
+        costValue.text(cost);
+        demandElement.text(demand);
+        profitElement.text(profit.toFixed(2));
+
+        updateChart(cost);
+    };
+
+    priceSlider.on('input', updateUI);
+    costSlider.on('input', updateUI);
+
+    updateUI(); 
+</script>
+
+</body>
+</html>
