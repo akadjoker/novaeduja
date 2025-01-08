@@ -10,12 +10,10 @@
         body {
             font-family: Arial, sans-serif;
             background-color: #f8f9fa;
-
-
         }
         .dice-roll {
-            width: 40px;
-            height: 40px;
+            width: 35px;
+            height: 35px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -23,22 +21,25 @@
             border: 1px solid #ddd;
             border-radius: 5px;
         }
+        .chart-container {
+            height: 250px; /* Altura menor para o gráfico */
+        }
     </style>
 </head>
 <body>
 
-<div class="container my-5">
+<div class="container my-4">
     <div class="card shadow">
         <div class="card-body">
-            <h2 class="card-title text-center">Simulador de Lançamento de Dados</h2>
-            <div class="d-flex gap-3 mb-4">
+            <h2 class="card-title text-center mb-3">Simulador de Lançamento de Dados</h2>
+            <div class="d-flex justify-content-center gap-2 flex-wrap mb-4">
                 <button id="rollOnce" class="btn btn-primary">Lançar 1 vez</button>
                 <button id="rollTen" class="btn btn-primary">Lançar 10 vezes</button>
                 <button id="rollHundred" class="btn btn-primary">Lançar 100 vezes</button>
                 <button id="reset" class="btn btn-outline-secondary">Reiniciar</button>
             </div>
-            <div class="row">
-                <div class="col-md-6">
+            <div class="row row-cols-1 row-cols-md-2 g-3">
+                <div class="col">
                     <div class="p-3 bg-light rounded">
                         <h5>Medidas de Tendência Central</h5>
                         <p>Total de lançamentos: <span id="totalRolls">0</span></p>
@@ -47,15 +48,15 @@
                         <p>Moda: <span id="mode">0</span></p>
                     </div>
                 </div>
-                <div class="col-md-6">
+                <div class="col">
                     <div class="p-3 bg-light rounded">
                         <h5>Últimos 10 lançamentos</h5>
-                        <div id="lastRolls" class="d-flex gap-2 flex-wrap"></div>
+                        <div id="lastRolls" class="d-flex gap-1 flex-wrap"></div>
                     </div>
                 </div>
             </div>
-            <div class="mt-4">
-                <canvas id="frequencyChart" height="200"></canvas>
+            <div class="mt-4 chart-container">
+                <canvas id="frequencyChart"></canvas>
             </div>
         </div>
     </div>
@@ -82,6 +83,7 @@
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
             scales: {
                 x: { title: { display: true, text: 'Faces do Dado' } },
                 y: { title: { display: true, text: 'Frequência' } }

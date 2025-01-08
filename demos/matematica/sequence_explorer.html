@@ -8,193 +8,188 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        .control-group {
+        .slider-label {
             display: flex;
-            align-items: center;
-            gap: 10px;
+            justify-content: space-between;
         }
-        .control-group label {
-            flex: 1;
-            font-size: 0.9rem;
-            margin-bottom: 0;
-        }
-        .control-group input {
-            flex: 3;
-        }
-        .sequence-box {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 5px;
-        }
-        .sequence-item {
-            padding: 5px 10px;
-            background-color: #f8f9fa;
-            border: 1px solid #ced4da;
-            border-radius: 4px;
+        .chart-container {
+            width: 100%;
+            max-width: 600px;
+            margin: auto;
         }
     </style>
 </head>
 <body class="bg-light">
 
-<div class="container my-4">
+<div class="container my-5">
     <div class="card shadow">
         <div class="card-body">
-            <h2 class="card-title text-center mb-4">Explorador de Progressões</h2>
-
-            <div class="row g-3">
-                <div class="col-lg-6">
-                    <div class="control-group">
-                        <label for="sequenceType">Tipo de Progressão:</label>
-                        <select id="sequenceType" class="form-select">
-                            <option value="PA">Progressão Aritmética (PA)</option>
-                            <option value="PG">Progressão Geométrica (PG)</option>
-                        </select>
+            <h2 class="card-title text-center">Explorador de Progressões</h2>
+            <div class="row">
+                <div class="col-md-4">
+                    <ul class="nav nav-pills mb-3" id="progression-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" data-sequence-type="PA">Progressão Aritmética</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-sequence-type="PG">Progressão Geométrica</a>
+                        </li>
+                    </ul>
+                    <div class="mb-3">
+                        <label class="slider-label">
+                            <span>Primeiro termo (a₁): <span id="firstTermValue">1</span></span>
+                        </label>
+                        <input type="range" id="firstTermSlider" class="form-range" min="1" max="10" step="1" value="1">
+                    </div>
+                    <div class="mb-3">
+                        <label class="slider-label">
+                            <span id="ratioLabel">Razão (r): <span id="ratioValue">1</span></span>
+                        </label>
+                        <input type="range" id="ratioSlider" class="form-range" min="-5" max="5" step="0.1" value="1">
+                    </div>
+                    <div class="mb-3">
+                        <label class="slider-label">
+                            <span>Número de termos: <span id="termsValue">10</span></span>
+                        </label>
+                        <input type="range" id="termsSlider" class="form-range" min="3" max="20" step="1" value="10">
                     </div>
                 </div>
-                <div class="col-lg-6">
-                    <div class="control-group">
-                        <label for="firstTerm">Primeiro Termo (a₁): <span id="firstTermValue">1</span></label>
-                        <input type="range" id="firstTerm" class="form-range" min="1" max="10" step="1" value="1">
+                <div class="col-md-8">
+                    <div class="bg-light p-3 rounded">
+                        <h5>Fórmula do termo geral:</h5>
+                        <p id="formulaText">aₙ = a₁ + (n-1)×r</p>
+                        <h5>Termos da sequência:</h5>
+                        <p id="sequenceTerms">-</p>
+                        <h5>Soma dos termos:</h5>
+                        <p id="sumText">Sₙ = -</p>
                     </div>
                 </div>
-                <div class="col-lg-6">
-                    <div class="control-group">
-                        <label for="ratio">Razão (r ou q): <span id="ratioValue">2</span></label>
-                        <input type="range" id="ratio" class="form-range" min="0.1" max="5" step="0.1" value="2">
-                    </div>
-                </div>
-                <div class="col-lg-6">
-                    <div class="control-group">
-                        <label for="terms">Número de Termos: <span id="termsValue">10</span></label>
-                        <input type="range" id="terms" class="form-range" min="3" max="20" step="1" value="10">
-                    </div>
-                </div>
-            </div>
-
-            <div class="mt-3">
-                <h5>Fórmula do Termo Geral:</h5>
-                <p id="formula">aₙ = a₁ + (n-1)×r</p>
-            </div>
-
-            <div class="mt-3">
-                <h5>Soma dos Termos:</h5>
-                <p id="sum">Sₙ = </p>
-            </div>
-
-            <div class="mt-3">
-                <h5>Termos da Sequência:</h5>
-                <div id="sequenceBox" class="sequence-box"></div>
-            </div>
-
-            <div class="mt-4">
-                <canvas id="sequenceChart" height="100"></canvas>
             </div>
         </div>
+    </div>
+
+    <div class="chart-container mt-5">
+        <canvas id="sequenceChart"></canvas>
     </div>
 </div>
 
 <script>
     $(document).ready(function () {
-        const sequenceTypeEl = $("#sequenceType");
-        const firstTermEl = $("#firstTerm");
-        const ratioEl = $("#ratio");
-        const termsEl = $("#terms");
+        const sequenceType = {
+            PA: 'PA',
+            PG: 'PG'
+        };
+        let currentSequenceType = sequenceType.PA;
+        let firstTerm = 1;
+        let ratio = 1;
+        let terms = 10;
 
-        const firstTermValueEl = $("#firstTermValue");
-        const ratioValueEl = $("#ratioValue");
-        const termsValueEl = $("#termsValue");
+        const $formulaText = $('#formulaText');
+        const $sequenceTerms = $('#sequenceTerms');
+        const $sumText = $('#sumText');
+        const $ratioSlider = $('#ratioSlider');
+        const $ratioLabel = $('#ratioLabel');
+        const sequenceChartCtx = $('#sequenceChart')[0].getContext('2d');
+        let sequenceChart;
 
-        const formulaEl = $("#formula");
-        const sumEl = $("#sum");
-        const sequenceBoxEl = $("#sequenceBox");
-        const chartCanvas = document.getElementById("sequenceChart");
-
-        let chartInstance;
-
-        const updateSequence = () => {
-            const type = sequenceTypeEl.val();
-            const a1 = parseFloat(firstTermEl.val());
-            const r = parseFloat(ratioEl.val());
-            const n = parseInt(termsEl.val());
-
-            firstTermValueEl.text(a1);
-            ratioValueEl.text(r);
-            termsValueEl.text(n);
-
-            let sequence = [];
+        function calculateSequence() {
+            const sequence = [];
             let sum = 0;
 
-            for (let i = 1; i <= n; i++) {
-                let term;
-                if (type === "PA") {
-                    term = a1 + (i - 1) * r;
+            for (let n = 1; n <= terms; n++) {
+                let value;
+                if (currentSequenceType === sequenceType.PA) {
+                    value = firstTerm + (n - 1) * ratio;
                 } else {
-                    term = a1 * Math.pow(r, i - 1);
+                    value = firstTerm * Math.pow(ratio, n - 1);
                 }
-                sequence.push({ n: i, value: term });
-                sum += term;
+                sequence.push({ x: n, y: value });
+                sum += value;
             }
 
-            // Atualizar fórmula e soma
-            formulaEl.text(type === "PA"
-                ? `aₙ = ${a1} + (n-1)×${r}`
-                : `aₙ = ${a1}×${r}^(n-1)`
-            );
-            sumEl.text(`Sₙ = ${sum.toFixed(2)}`);
+            return { sequence, sum };
+        }
 
-            // Atualizar sequência visual
-            sequenceBoxEl.html("");
-            sequence.forEach(term => {
-                sequenceBoxEl.append(`<div class="sequence-item">${term.value.toFixed(1)}</div>`);
-            });
+        function updateChart(data) {
+            const labels = data.map(point => point.x);
+            const values = data.map(point => point.y);
 
-            // Atualizar gráfico
-            updateChart(sequence);
-        };
-
-        const updateChart = (sequence) => {
-            const data = {
-                labels: sequence.map(item => item.n),
-                datasets: [{
-                    label: "Valores da Sequência",
-                    data: sequence.map(item => item.value),
-                    borderColor: "#8884d8",
-                    fill: false,
-                    tension: 0.1
-                }]
-            };
-
-            const options = {
-                responsive: true,
-                scales: {
-                    x: {
-                        title: { display: true, text: "n-ésimo Termo" }
+            if (!sequenceChart) {
+                sequenceChart = new Chart(sequenceChartCtx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Valores da sequência',
+                            data: values,
+                            borderColor: '#4caf50',
+                            backgroundColor: 'rgba(76, 175, 80, 0.2)',
+                            fill: true
+                        }]
                     },
-                    y: {
-                        title: { display: true, text: "Valor" }
+                    options: {
+                        responsive: true,
+                        scales: {
+                            x: { title: { display: true, text: 'n-ésimo termo' } },
+                            y: { title: { display: true, text: 'Valor' } }
+                        }
                     }
-                }
-            };
+                });
+            } else {
+                sequenceChart.data.labels = labels;
+                sequenceChart.data.datasets[0].data = values;
+                sequenceChart.update();
+            }
+        }
 
-            if (chartInstance) {
-                chartInstance.destroy();
+        function updateUI() {
+            const { sequence, sum } = calculateSequence();
+            const sequenceText = sequence.map(item => item.y.toFixed(2)).join(', ') + (sequence.length > 10 ? '...' : '');
+
+            $formulaText.text(currentSequenceType === sequenceType.PA
+                ? `aₙ = ${firstTerm} + (n-1)×${ratio}`
+                : `aₙ = ${firstTerm}×${ratio}^(n-1)`);
+            $sequenceTerms.text(sequenceText);
+            $sumText.text(`Sₙ = ${sum.toFixed(2)}`);
+
+            updateChart(sequence);
+        }
+
+        $('#progression-tabs .nav-link').click(function () {
+            $('#progression-tabs .nav-link').removeClass('active');
+            $(this).addClass('active');
+            currentSequenceType = $(this).data('sequence-type');
+
+            if (currentSequenceType === sequenceType.PA) {
+                $ratioSlider.attr({ min: -5, max: 5, step: 0.1 }).val(ratio);
+                $ratioLabel.text(`Razão (r):`);
+            } else {
+                $ratioSlider.attr({ min: 0.1, max: 5, step: 0.1 }).val(ratio);
+                $ratioLabel.text(`Razão (q):`);
             }
 
-            chartInstance = new Chart(chartCanvas, {
-                type: "line",
-                data,
-                options
-            });
-        };
+            updateUI();
+        });
 
-        // Eventos
-        sequenceTypeEl.on("change", updateSequence);
-        firstTermEl.on("input", updateSequence);
-        ratioEl.on("input", updateSequence);
-        termsEl.on("input", updateSequence);
+        $('#firstTermSlider').on('input', function () {
+            firstTerm = parseFloat($(this).val());
+            $('#firstTermValue').text(firstTerm);
+            updateUI();
+        });
 
-        // Inicializar
-        updateSequence();
+        $ratioSlider.on('input', function () {
+            ratio = parseFloat($(this).val());
+            $('#ratioValue').text(ratio);
+            updateUI();
+        });
+
+        $('#termsSlider').on('input', function () {
+            terms = parseInt($(this).val());
+            $('#termsValue').text(terms);
+            updateUI();
+        });
+
+        updateUI();
     });
 </script>
 
