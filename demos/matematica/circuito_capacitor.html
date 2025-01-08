@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Circuito RC Interativo</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin: 20px 0;
+        }
+        .progress-bar {
+            height: 20px;
+            background-color: #4caf50;
+            transition: width 0.3s ease-in-out;
+        }
+        .controls {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <h2 class="text-center">Circuito RC Interativo</h2>
+        <p class="text-center lead">Visualize o comportamento de um capacitor em um circuito RC</p>
+
+        <div class="row">
+            <div class="col-md-8">
+                <div class="chart-container">
+                    <canvas id="chargeChart"></canvas>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="controls">
+                    <h5 class="mb-3">Parâmetros</h5>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Tensão da Bateria (V)</label>
+                        <input type="range" class="form-range" id="voltageControl" min="0" max="24" step="0.5" value="12">
+                        <div class="text-center" id="voltageDisplay">12V</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Resistência (Ω)</label>
+                        <input type="range" class="form-range" id="resistanceControl" min="10" max="1000" step="10" value="100">
+                        <div class="text-center" id="resistanceDisplay">100Ω</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Capacitância (μF)</label>
+                        <input type="range" class="form-range" id="capacitanceControl" min="1" max="100" step="1" value="10">
+                        <div class="text-center" id="capacitanceDisplay">10μF</div>
+                    </div>
+                    
+                    <hr>
+
+                    <div class="mb-3">
+                        <label class="form-label">Tempo de Carregamento:</label>
+                        <div class="progress">
+                            <div class="progress-bar" id="capacitorCharge" style="width: 0%;"></div>
+                        </div>
+                        <div class="text-center mt-2" id="timeConstantDisplay">1.00s</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+    <script>
+        const chargeChart = new Chart(document.getElementById('chargeChart').getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Carga do Capacitor (V)',
+                    data: [],
+                    borderColor: '#4caf50',
+                    borderWidth: 2,
+                    tension: 0.3,
+                    pointRadius: 0,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        title: { display: true, text: 'Tempo (s)' },
+                        grid: { color: 'rgba(0,0,0,0.1)' }
+                    },
+                    y: {
+                        title: { display: true, text: 'Tensão (V)' },
+                        beginAtZero: true,
+                        grid: { color: 'rgba(0,0,0,0.1)' }
+                    }
+                },
+                plugins: {
+                    legend: { position: 'top' },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `${context.raw.toFixed(2)} V`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        function updateCircuit() {
+            const voltage = parseFloat(document.getElementById('voltageControl').value);
+            const resistance = parseFloat(document.getElementById('resistanceControl').value);
+            const capacitance = parseFloat(document.getElementById('capacitanceControl').value);
+
+            // Constante de tempo RC
+            const timeConstant = (resistance * capacitance) / 1000000;
+            document.getElementById('timeConstantDisplay').textContent = `${timeConstant.toFixed(2)}s`;
+
+            // Atualizar valores no UI
+            document.getElementById('voltageDisplay').textContent = `${voltage.toFixed(1)}V`;
+            document.getElementById('resistanceDisplay').textContent = `${resistance}Ω`;
+            document.getElementById('capacitanceDisplay').textContent = `${capacitance}μF`;
+
+            // Simular carregamento
+            simulateCharging(voltage, timeConstant);
+        }
+
+        function simulateCharging(voltage, timeConstant) {
+            const maxTime = 5 * timeConstant; // 5 constantes de tempo para carga completa
+            const step = maxTime / 100; // Dividir em 100 passos
+            let time = 0;
+
+            chargeChart.data.labels = [];
+            chargeChart.data.datasets[0].data = [];
+            const progressBar = document.getElementById('capacitorCharge');
+
+            const interval = setInterval(() => {
+                const charge = voltage * (1 - Math.exp(-time / timeConstant));
+                chargeChart.data.labels.push(time.toFixed(2));
+                chargeChart.data.datasets[0].data.push(charge);
+
+                // Atualizar barra de progresso
+                const percentage = (charge / voltage) * 100;
+                progressBar.style.width = `${percentage.toFixed(0)}%`;
+
+                chargeChart.update();
+
+                if (time >= maxTime) {
+                    clearInterval(interval);
+                }
+
+                time += step;
+            }, 50);
+        }
+
+        document.getElementById('voltageControl').addEventListener('input', updateCircuit);
+        document.getElementById('resistanceControl').addEventListener('input', updateCircuit);
+        document.getElementById('capacitanceControl').addEventListener('input', updateCircuit);
+
+        updateCircuit();
+    </script>
+</body>
+</html>
