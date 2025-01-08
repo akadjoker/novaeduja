@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geometria Espacial</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        .shape-display {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        .feedback {
+            font-size: 1.2em;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .tips {
+            font-size: 0.9em;
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container my-5">
+    <div class="card shadow">
+        <div class="card-body">
+            <h2 class="card-title text-center">Geometria Espacial</h2>
+            <div class="text-center mb-3">Pontuação: <span id="score">0</span></div>
+            <div class="text-center mb-3">Nível: <span id="difficulty">1</span></div>
+            <div id="shapeDisplay" class="shape-display"></div>
+            <div id="question" class="text-center mb-3"></div>
+            <input
+                type="number"
+                id="userAnswer"
+                class="form-control text-center mb-3"
+                placeholder="Qual é o volume?"
+            />
+            <button id="checkAnswer" class="btn btn-primary w-100">Verificar</button>
+            <div id="feedback" class="feedback"></div>
+            <div class="text-center mt-3">
+                <button id="nextQuestion" class="btn btn-secondary w-100" style="display: none;">Próxima Questão</button>
+                <button id="increaseDifficulty" class="btn btn-outline-secondary w-100" style="display: none;">Aumentar Dificuldade</button>
+            </div>
+            <div class="tips">
+                <p><strong>Dicas:</strong></p>
+                <p>- Volume do cubo = lado³</p>
+                <p>- Volume do cilindro = π × raio² × altura</p>
+                <p>- Volume do prisma = comprimento × largura × altura</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let score = 0;
+    let difficulty = 1;
+    let currentShape = null;
+
+    const scoreEl = document.getElementById('score');
+    const difficultyEl = document.getElementById('difficulty');
+    const shapeDisplayEl = document.getElementById('shapeDisplay');
+    const questionEl = document.getElementById('question');
+    const userAnswerEl = document.getElementById('userAnswer');
+    const feedbackEl = document.getElementById('feedback');
+    const checkAnswerBtn = document.getElementById('checkAnswer');
+    const nextQuestionBtn = document.getElementById('nextQuestion');
+    const increaseDifficultyBtn = document.getElementById('increaseDifficulty');
+
+    const generateCube = () => {
+        const lado = Math.floor(Math.random() * 5 * difficulty) + 1;
+        return {
+            type: 'cube',
+            question: `Um cubo tem lado de ${lado} unidades. Qual é seu volume?`,
+            volume: Math.pow(lado, 3),
+            svg: `
+                <rect x="50" y="50" width="100" height="100" fill="none" stroke="black" />
+                <rect x="80" y="20" width="100" height="100" fill="none" stroke="black" stroke-dasharray="5,5" />
+                <line x1="50" y1="50" x2="80" y2="20" stroke="black" />
+                <line x1="150" y1="50" x2="180" y2="20" stroke="black" />
+                <line x1="50" y1="150" x2="80" y2="120" stroke="black" />
+                <line x1="150" y1="150" x2="180" y2="120" stroke="black" />
+            `
+        };
+    };
+
+    const generateCylinder = () => {
+        const raio = Math.floor(Math.random() * 3 * difficulty) + 1;
+        const altura = Math.floor(Math.random() * 4 * difficulty) + 1;
+        return {
+            type: 'cylinder',
+            question: `Um cilindro tem raio ${raio} e altura ${altura}. Qual é seu volume?`,
+            volume: Math.PI * Math.pow(raio, 2) * altura,
+            svg: `
+                <ellipse cx="100" cy="50" rx="50" ry="20" fill="none" stroke="black" />
+                <ellipse cx="100" cy="150" rx="50" ry="20" fill="none" stroke="black" />
+                <line x1="50" y1="50" x2="50" y2="150" stroke="black" />
+                <line x1="150" y1="50" x2="150" y2="150" stroke="black" />
+            `
+        };
+    };
+
+    const generatePrism = () => {
+        const comprimento = Math.floor(Math.random() * 4 * difficulty) + 1;
+        const largura = Math.floor(Math.random() * 3 * difficulty) + 1;
+        const altura = Math.floor(Math.random() * 3 * difficulty) + 1;
+        return {
+            type: 'prism',
+            question: `Um prisma tem comprimento ${comprimento}, largura ${largura}, e altura ${altura}. Qual é seu volume?`,
+            volume: comprimento * largura * altura,
+            svg: `
+                <rect x="40" y="60" width="80" height="100" fill="none" stroke="black" />
+                <path d="M40,60 L80,20 L160,20 L120,60 Z" fill="none" stroke="black" />
+                <path d="M120,60 L160,20 L160,120 L120,160 Z" fill="none" stroke="black" />
+            `
+        };
+    };
+
+    const shapes = [generateCube, generateCylinder, generatePrism];
+
+    const startNewRound = () => {
+        const generateShape = shapes[Math.floor(Math.random() * shapes.length)];
+        currentShape = generateShape();
+        shapeDisplayEl.innerHTML = `<svg width="200" height="200" viewBox="0 0 200 200">${currentShape.svg}</svg>`;
+        questionEl.textContent = currentShape.question;
+        userAnswerEl.value = '';
+        feedbackEl.textContent = '';
+        nextQuestionBtn.style.display = 'none';
+        increaseDifficultyBtn.style.display = 'none';
+    };
+
+    const checkAnswer = () => {
+        const userGuess = parseFloat(userAnswerEl.value);
+        if (isNaN(userGuess)) {
+            feedbackEl.textContent = 'Por favor, insere um número válido.';
+            return;
+        }
+
+        if (Math.abs(userGuess - currentShape.volume) < 0.1) {
+            score += difficulty;
+            feedbackEl.textContent = `Correto! +${difficulty} pontos`;
+        } else {
+            feedbackEl.textContent = `Incorreto. A resposta correta era ${currentShape.volume.toFixed(2)}`;
+        }
+
+        scoreEl.textContent = score;
+        nextQuestionBtn.style.display = 'block';
+        increaseDifficultyBtn.style.display = 'block';
+    };
+
+    checkAnswerBtn.addEventListener('click', checkAnswer);
+    nextQuestionBtn.addEventListener('click', startNewRound);
+    increaseDifficultyBtn.addEventListener('click', () => {
+        difficulty = Math.min(difficulty + 1, 5);
+        difficultyEl.textContent = difficulty;
+        startNewRound();
+    });
+
+    startNewRound();
+</script>
+
+</body>
+</html>

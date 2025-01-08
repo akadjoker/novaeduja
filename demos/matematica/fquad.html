@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo das Funções Quadráticas</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .chart-container {
+            width: 100%;
+            height: 300px;
+            background: #f8f9fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        .option-button {
+            margin: 5px;
+            padding: 10px 15px;
+            border: 1px solid #007bff;
+            background-color: #fff;
+            color: #007bff;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .option-button:hover {
+            background-color: #007bff;
+            color: #fff;
+        }
+        .feedback {
+            font-size: 1.2em;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body class="bg-light">
+
+<div class="container my-5">
+    <div class="card shadow">
+        <div class="card-body">
+            <h2 class="card-title text-center">Jogo das Funções Quadráticas</h2>
+            <div class="chart-container">
+                <canvas id="quadraticChart"></canvas>
+            </div>
+            <div h2 class="card-title text-center">Qual é a função quadrática que corresponde a este gráfico?</h2>
+            <div id="options" class="d-flex justify-content-center flex-wrap"></div>
+            <div class="feedback text-center" id="feedback"></div>
+            <button id="next" class="btn btn-primary w-100 mt-3" style="display: none;">Próxima Questão</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        let score = 0;
+        let equation = {};
+        let options = [];
+        const feedbackEl = $("#feedback");
+        const optionsContainer = $("#options");
+        const nextButton = $("#next");
+
+        const generateEquation = () => {
+            const a = Math.floor(Math.random() * 3) + 1;
+            const b = Math.floor(Math.random() * 10) - 5;
+            const c = Math.floor(Math.random() * 10) - 5;
+            return { a, b, c };
+        };
+
+        const generateData = (eq) => {
+            let points = [];
+            for (let x = -5; x <= 5; x++) {
+                const y = eq.a * x * x + eq.b * x + eq.c;
+                points.push({ x, y });
+            }
+            return points;
+        };
+
+        const generateOptions = (correct) => {
+            const options = [correct];
+            while (options.length < 4) {
+                const fake = generateEquation();
+                if (!options.find(
+                    (opt) => opt.a === fake.a && opt.b === fake.b && opt.c === fake.c
+                )) {
+                    options.push(fake);
+                }
+            }
+            return options.sort(() => Math.random() - 0.5);
+        };
+
+        const drawChart = (data) => {
+            quadraticChart.data.labels = data.map(d => d.x);
+            quadraticChart.data.datasets[0].data = data.map(d => d.y);
+            quadraticChart.update();
+        };
+
+        const renderOptions = () => {
+            optionsContainer.empty();
+            options.forEach(opt => {
+                const btn = $(`<button class="option-button">f(x) = ${opt.a}x² ${opt.b >= 0 ? '+' : ''}${opt.b}x ${opt.c >= 0 ? '+' : ''}${opt.c}</button>`);
+                btn.click(() => checkAnswer(opt));
+                optionsContainer.append(btn);
+            });
+        };
+
+        const startNewRound = () => {
+            equation = generateEquation();
+            const data = generateData(equation);
+            options = generateOptions(equation);
+            drawChart(data);
+            renderOptions();
+            feedbackEl.text("");
+            nextButton.hide();
+        };
+
+        const checkAnswer = (selected) => {
+            if (
+                selected.a === equation.a &&
+                selected.b === equation.b &&
+                selected.c === equation.c
+            ) {
+                score++;
+                feedbackEl.text("Correto! +1 ponto").addClass("text-success").removeClass("text-danger");
+            } else {
+                feedbackEl.text("Incorreto. Tenta novamente!").addClass("text-danger").removeClass("text-success");
+            }
+            nextButton.show();
+        };
+
+        nextButton.click(startNewRound);
+
+        // Criar gráfico
+        const ctx = document.getElementById("quadraticChart").getContext("2d");
+        const quadraticChart = new Chart(ctx, {
+            type: "line",
+            data: {
+                labels: [],
+                datasets: [{
+                    label: "Função Quadrática",
+                    data: [],
+                    borderColor: "#007bff",
+                    borderWidth: 2,
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: { title: { display: true, text: "x" } },
+                    y: { title: { display: true, text: "f(x)" } }
+                }
+            }
+        });
+
+        startNewRound();
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Descobrindo Sequências</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+
+        .sequence-display {
+            font-size: 1.5em;
+            font-weight: bold;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .feedback {
+            font-size: 1.2em;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .tips {
+            font-size: 0.9em;
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container my-5">
+        <div class="card shadow">
+            <div class="card-body">
+                <h2 class="card-title text-center">Descobrindo Sequências</h2>
+                <div class="text-center mb-3">Pontuação: <span id="score">0</span></div>
+                <div class="text-center mb-3">Nível: <span id="difficulty">1</span></div>
+                <div id="sequenceDisplay" class="sequence-display">?</div>
+                <input type="number" id="userAnswer" class="form-control text-center mb-3"
+                    placeholder="Próximo número?" />
+                <button id="checkAnswer" class="btn btn-primary w-100">Verificar</button>
+                <div id="feedback" class="feedback"></div>
+                <div class="text-center mt-3">
+                    <button id="nextSequence" class="btn btn-secondary w-100" style="display: none;">Próxima
+                        Sequência</button>
+                    <button id="increaseDifficulty" class="btn btn-outline-secondary w-100"
+                        style="display: none;">Aumentar Dificuldade</button>
+                </div>
+                <div class="tips">
+                    <p><strong>Dicas:</strong></p>
+                    <p>- Em uma PA, a diferença entre termos consecutivos é constante</p>
+                    <p>- Em uma PG, a razão entre termos consecutivos é constante</p>
+                    <p>- Observa o padrão antes de responderes!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let score = 0;
+        let difficulty = 1;
+        let sequence = [];
+        let sequenceType = '';
+        let correctAnswer = 0;
+
+        const scoreEl = document.getElementById('score');
+        const difficultyEl = document.getElementById('difficulty');
+        const sequenceDisplayEl = document.getElementById('sequenceDisplay');
+        const userAnswerEl = document.getElementById('userAnswer');
+        const feedbackEl = document.getElementById('feedback');
+        const checkAnswerBtn = document.getElementById('checkAnswer');
+        const nextSequenceBtn = document.getElementById('nextSequence');
+        const increaseDifficultyBtn = document.getElementById('increaseDifficulty');
+
+        const generatePA = (difficulty) => {
+            const start = Math.floor(Math.random() * 10) - 5;
+            const razao = Math.floor(Math.random() * (3 * difficulty)) + 1;
+            const seq = Array.from({ length: 5 }, (_, i) => start + razao * i);
+            return {
+                sequence: seq,
+                type: 'PA',
+                nextNumber: start + razao * 5
+            };
+        };
+
+        const generatePG = (difficulty) => {
+            const start = Math.floor(Math.random() * 5) + 1;
+            const razao = Math.floor(Math.random() * difficulty) + 2;
+            const seq = Array.from({ length: 5 }, (_, i) => start * Math.pow(razao, i));
+            return {
+                sequence: seq,
+                type: 'PG',
+                nextNumber: start * Math.pow(razao, 5)
+            };
+        };
+
+        const generateNewSequence = () => {
+            const isPA = Math.random() > 0.5;
+            const sequenceData = isPA ? generatePA(difficulty) : generatePG(difficulty);
+            sequence = sequenceData.sequence;
+            sequenceType = sequenceData.type;
+            correctAnswer = sequenceData.nextNumber;
+            sequenceDisplayEl.textContent = `${sequence.join(' → ')} → ?`;
+            userAnswerEl.value = '';
+            feedbackEl.textContent = '';
+            nextSequenceBtn.style.display = 'none';
+            increaseDifficultyBtn.style.display = 'none';
+        };
+
+        const checkAnswer = () => {
+            const userGuess = parseFloat(userAnswerEl.value);
+            if (isNaN(userGuess)) {
+                feedbackEl.textContent = 'Por favor, insere um número válido.';
+                return;
+            }
+            if (Math.abs(userGuess - correctAnswer) < 0.01) {
+                score += difficulty;
+                feedbackEl.textContent = `Correto! +${difficulty} pontos. Esta é uma ${sequenceType}!`;
+            } else {
+                feedbackEl.textContent = `Incorreto. A resposta correta era ${correctAnswer}. Esta é uma ${sequenceType}!`;
+            }
+            scoreEl.textContent = score;
+            nextSequenceBtn.style.display = 'block';
+            increaseDifficultyBtn.style.display = 'block';
+        };
+
+        const increaseDifficulty = () => {
+            difficulty = Math.min(difficulty + 1, 5);
+            difficultyEl.textContent = difficulty;
+            generateNewSequence();
+        };
+
+        checkAnswerBtn.addEventListener('click', checkAnswer);
+        nextSequenceBtn.addEventListener('click', generateNewSequence);
+        increaseDifficultyBtn.addEventListener('click', increaseDifficulty);
+
+        generateNewSequence();
+    </script>
+
+</body>
+
+</html>

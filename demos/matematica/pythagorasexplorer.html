@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explorador do Teorema de Pitágoras</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+        }
+        .slider-container {
+            margin-bottom: 20px;
+        }
+        .triangle-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+        }
+        svg {
+            border: 1px solid #ccc;
+            background-color: white;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container my-5">
+    <div class="card shadow">
+        <div class="card-body">
+            <h2 class="card-title text-center">Explorador do Teorema de Pitágoras</h2>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="slider-container">
+                        <label for="sideA" class="form-label">Cateto a: <span id="sideAValue">3</span></label>
+                        <input type="range" class="form-range" id="sideA" min="1" max="8" step="0.5" value="3">
+                    </div>
+                    <div class="slider-container">
+                        <label for="sideB" class="form-label">Cateto b: <span id="sideBValue">4</span></label>
+                        <input type="range" class="form-range" id="sideB" min="1" max="8" step="0.5" value="4">
+                    </div>
+                    <div class="alert alert-info mt-4">
+                        <p><strong>Hipotenusa (c):</strong> <span id="sideCValue">5.00</span></p>
+                        <p><strong>Fórmula:</strong> a² + b² = c²</p>
+                        <p id="equation">3² + 4² = 5²</p>
+                        <p id="calculation">9 + 16 = 25</p>
+                    </div>
+                </div>
+                <div class="col-md-6 triangle-container">
+                    <svg id="triangleSvg" width="400" height="300"></svg>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const sideAInput = document.getElementById('sideA');
+    const sideBInput = document.getElementById('sideB');
+    const sideAValue = document.getElementById('sideAValue');
+    const sideBValue = document.getElementById('sideBValue');
+    const sideCValue = document.getElementById('sideCValue');
+    const equationText = document.getElementById('equation');
+    const calculationText = document.getElementById('calculation');
+    const triangleSvg = document.getElementById('triangleSvg');
+
+    const scale = 40;
+
+    function updateTriangle() {
+        const sideA = parseFloat(sideAInput.value);
+        const sideB = parseFloat(sideBInput.value);
+        const sideC = Math.sqrt(sideA * sideA + sideB * sideB);
+
+        // Atualizar valores
+        sideAValue.textContent = sideA;
+        sideBValue.textContent = sideB;
+        sideCValue.textContent = sideC.toFixed(2);
+        equationText.textContent = `${sideA}² + ${sideB}² = ${sideC.toFixed(2)}²`;
+        calculationText.textContent = `${(sideA * sideA).toFixed(2)} + ${(sideB * sideB).toFixed(2)} = ${(sideC * sideC).toFixed(2)}`;
+
+        // Coordenadas para o triângulo
+        const x1 = 50, y1 = 250;
+        const x2 = x1 + sideA * scale, y2 = y1;
+        const x3 = x2, y3 = y1 - sideB * scale;
+
+        // Desenhar triângulo
+        triangleSvg.innerHTML = `
+            <path d="M${x1},${y1} L${x2},${y2} L${x3},${y3} Z" 
+                fill="rgba(147, 197, 253, 0.3)" 
+                stroke="rgb(59, 130, 246)" 
+                stroke-width="2" />
+            <text x="${x1 + sideA * scale / 2}" y="${y1 + 20}" text-anchor="middle">a = ${sideA}</text>
+            <text x="${x2 + 15}" y="${y2 - sideB * scale / 2}" text-anchor="middle">b = ${sideB}</text>
+            <text x="${x1 + sideA * scale / 2 + 20}" y="${y1 - sideB * scale / 2 - 10}" text-anchor="middle">c = ${sideC.toFixed(2)}</text>
+        `;
+    }
+
+    sideAInput.addEventListener('input', updateTriangle);
+    sideBInput.addEventListener('input', updateTriangle);
+
+    updateTriangle();
+</script>
+
+</body>
+</html>

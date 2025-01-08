@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Explorador de Sistemas Lineares</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css">
+</head>
+<body class="bg-light p-4">
+
+<div class="container">
+  <h1 class="text-center mb-4">Explorador de Sistemas Lineares</h1>
+
+  <div class="row">
+    <div class="col-md-6">
+      <div class="mb-3">
+        <h3>Primeira Equação</h3>
+        <label for="a1" class="form-label">a₁: <span id="a1-value">1</span></label>
+        <input type="range" id="a1" class="form-range" min="-5" max="5" step="1" value="1">
+        <label for="b1" class="form-label">b₁: <span id="b1-value">2</span></label>
+        <input type="range" id="b1" class="form-range" min="-5" max="5" step="1" value="2">
+        <label for="c1" class="form-label">c₁: <span id="c1-value">4</span></label>
+        <input type="range" id="c1" class="form-range" min="-10" max="10" step="1" value="4">
+      </div>
+
+      <div class="mb-3">
+        <h3>Segunda Equação</h3>
+        <label for="a2" class="form-label">a₂: <span id="a2-value">2</span></label>
+        <input type="range" id="a2" class="form-range" min="-5" max="5" step="1" value="2">
+        <label for="b2" class="form-label">b₂: <span id="b2-value">1</span></label>
+        <input type="range" id="b2" class="form-range" min="-5" max="5" step="1" value="1">
+        <label for="c2" class="form-label">c₂: <span id="c2-value">5</span></label>
+        <input type="range" id="c2" class="form-range" min="-10" max="10" step="1" value="5">
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <h3>Solução</h3>
+      <p id="solution" class="p-3 bg-white rounded border"></p>
+      <div class="chart-container">
+        <canvas id="linearSystemChart" width="400" height="400"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  $(document).ready(function () {
+    const ctx = $('#linearSystemChart');
+    const chart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        datasets: [
+          {
+            label: 'Equação 1',
+            borderColor: '#007bff',
+            borderWidth: 2,
+            fill: false,
+            data: [],
+          },
+          {
+            label: 'Equação 2',
+            borderColor: '#dc3545',
+            borderWidth: 2,
+            fill: false,
+            data: [],
+          },
+        ],
+      },
+      options: {
+        scales: {
+          x: {
+            type: 'linear',
+            position: 'bottom',
+            min: -10,
+            max: 10,
+          },
+          y: {
+            min: -10,
+            max: 10,
+          },
+        },
+      },
+    });
+
+    function updateChart() {
+      const a1 = parseFloat($('#a1').val());
+      const b1 = parseFloat($('#b1').val());
+      const c1 = parseFloat($('#c1').val());
+      const a2 = parseFloat($('#a2').val());
+      const b2 = parseFloat($('#b2').val());
+      const c2 = parseFloat($('#c2').val());
+
+      // Calcular solução
+      const determinant = a1 * b2 - a2 * b1;
+      let solutionText = '';
+      if (Math.abs(determinant) < 0.001) {
+        solutionText = 'Sistema sem solução única';
+      } else {
+        const x = (c1 * b2 - c2 * b1) / determinant;
+        const y = (a1 * c2 - a2 * c1) / determinant;
+        solutionText = `Solução: x = ${x.toFixed(2)}, y = ${y.toFixed(2)}`;
+        chart.data.datasets[0].data.push({ x, y });
+      }
+      $('#solution').text(solutionText);
+
+      // Gerar pontos para o gráfico
+      const points1 = [];
+      const points2 = [];
+      for (let x = -10; x <= 10; x++) {
+        const y1 = (c1 - a1 * x) / b1;
+        const y2 = (c2 - a2 * x) / b2;
+        points1.push({ x, y: y1 });
+        points2.push({ x, y: y2 });
+      }
+
+      chart.data.datasets[0].data = points1;
+      chart.data.datasets[1].data = points2;
+      chart.update();
+    }
+
+    // Atualizar valores no UI
+    $('input[type="range"]').on('input', function () {
+      const id = $(this).attr('id');
+      $(`#${id}-value`).text($(this).val());
+      updateChart();
+    });
+
+    // Inicializar o gráfico
+    updateChart();
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,79 @@
+[
+    {
+      "id": "funcquadratica",
+      "titulo": "Função Quadrática",
+      "screenshot": "demos/matematica/screenshots/fquad.jpg",
+      "arquivo": "demos/matematica/fquad.html",
+      "descricao": "Jogo das Funções Quadráticas"
+    },
+    {
+      "id":"probestatica",
+      "titulo":"Probabilidade Estática",
+      "screenshot":"demos/matematica/screenshots/probestatica.jpg",
+      "arquivo":"demos/matematica/probestatica.html",
+      "descricao":"Probabilidade e Estatística"
+    },
+    {
+      "id":"trinocircular",
+      "titulo":"Trigonometria no Círculo",
+      "screenshot":"demos/matematica/screenshots/trinocircular.jpg",
+      "arquivo":"demos/matematica/trinocircular.html",
+       "descricao": "Jogo de Trigonometria no Círculo Unitário"
+    },
+    {
+      "id": "sequencesgame",
+      "titulo": "Jogo de Sequências",
+      "screenshot": "demos/matematica/screenshots/sequencias.jpg",
+      "arquivo": "demos/matematica/sequencias.html",
+      "descricao": "Identifica padrões em PA e PG e descobre o próximo número."
+    },
+    {
+      "id": "geometrygame",
+      "titulo": "Geometria Espacial",
+      "screenshot": "demos/matematica/screenshots/geometry.jpg",
+      "arquivo": "demos/matematica/geometry.html",
+      "descricao": "Descobre o volume de cubos, cilindros e prismas em desafios espaciais."
+    },
+    {
+      "id": "quadraticexplorer",
+      "titulo": "Explorador de Funções Quadráticas",
+      "screenshot": "demos/matematica/screenshots/quadraticexplorer.jpg",
+      "arquivo": "demos/matematica/quadraticexplorer.html",
+      "descricao": "Ajusta os coeficientes a, b, c e explora como a parábola muda no gráfico."
+    },
+    {
+      "id": "pythagorasexplorer",
+      "titulo": "Explorador do Teorema de Pitágoras",
+      "screenshot": "demos/matematica/screenshots/pythagorasexplorer.jpg",
+      "arquivo": "demos/matematica/pythagorasexplorer.html",
+      "descricao": "Visualiza como os catetos e a hipotenusa se relacionam no Teorema de Pitágoras."
+    },
+    {
+      "id": "dicesimulator",
+      "titulo": "Simulador de Lançamento de Dados",
+      "screenshot": "demos/matematica/screenshots/dicesimulator.jpg",
+      "arquivo": "demos/matematica/dicesimulator.html",
+      "descricao": "Explora estatísticas como média, moda e mediana com lançamentos de dados."
+    },
+    {
+      "id": "linearsystem",
+      "titulo": "Explorador de Sistemas Lineares",
+      "screenshot": "demos/matematica/screenshots/linearsystem.jpg",
+      "arquivo": "demos/matematica/linearsystem.html",
+      "descricao": "Explora visualmente sistemas de equações lineares e suas soluções"
+    },
+    {
+      "id": "sequence_explorer",
+      "titulo": "Explorador de Progressões",
+      "screenshot": "demos/matematica/screenshots/sequence_explorer.jpg",
+      "arquivo": "demos/matematica/sequence_explorer.html",
+      "descricao": "Explora progressões aritméticas e geométricas com gráficos e cálculos interativos."
+    }
+    
+    
+    
+    
+    
+
+    
+  ]

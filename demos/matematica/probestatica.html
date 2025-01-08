@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Probabilidade e Estatística</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+        }
+        .chart-container {
+            width: 100%;
+            height: 300px;
+        }
+        .feedback {
+            font-size: 1.2em;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .button {
+            margin: 5px 0;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container my-5">
+    <div class="card shadow">
+        <div class="card-body">
+            <h2 class="card-title text-center">Probabilidade e Estatística</h2>
+            <div class="d-flex justify-content-between">
+                <span id="score">Pontuação: 0</span>
+                <span id="diceCount">Dados: 2</span>
+            </div>
+            <div class="chart-container mt-4">
+                <canvas id="barChart"></canvas>
+            </div>
+            <div id="problem" class="text-center my-4"></div>
+            <div id="inputSection" class="my-3">
+                <input 
+                    type="number" 
+                    id="userAnswer" 
+                    class="form-control mb-2" 
+                    placeholder="Tua resposta" 
+                    step="0.1"
+                >
+                <button id="checkAnswer" class="btn btn-primary w-100">Verifica</button>
+            </div>
+            <div id="feedback" class="feedback"></div>
+            <div id="nextSection" class="text-center mt-4" style="display: none;">
+                <button id="nextQuestion" class="btn btn-primary">Próxima Questão</button>
+                <button id="increaseDifficulty" class="btn btn-outline-secondary">Aumentar Dificuldade</button>
+            </div>
+            <div class="mt-4 p-4 bg-light rounded">
+                <p class="text-sm">
+                    Dicas:
+                    <br />- A média é a soma dos valores dividida pela quantidade de valores.
+                    <br />- A moda é o valor que aparece com mais frequência.
+                    <br />- A probabilidade é calculada como (casos favoráveis)/(casos possíveis) × 100%.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let score = 0;
+    let diceCount = 2;
+    let rolls = [];
+    let currentProblem = null;
+
+    const scoreEl = document.getElementById('score');
+    const diceCountEl = document.getElementById('diceCount');
+    const problemEl = document.getElementById('problem');
+    const feedbackEl = document.getElementById('feedback');
+    const userAnswerEl = document.getElementById('userAnswer');
+    const checkAnswerBtn = document.getElementById('checkAnswer');
+    const nextQuestionBtn = document.getElementById('nextQuestion');
+    const increaseDifficultyBtn = document.getElementById('increaseDifficulty');
+    const nextSection = document.getElementById('nextSection');
+
+    const ctx = document.getElementById('barChart').getContext('2d');
+    const barChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: [],
+            datasets: [{
+                label: 'Frequência',
+                data: [],
+                backgroundColor: '#8884d8'
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                x: { title: { display: true, text: 'Valor' } },
+                y: { title: { display: true, text: 'Frequência' } }
+            }
+        }
+    });
+
+    const rollDice = () => {
+        rolls = Array(20).fill(0).map(() => {
+            let sum = 0;
+            for (let i = 0; i < diceCount; i++) {
+                sum += Math.floor(Math.random() * 6) + 1;
+            }
+            return sum;
+        });
+        updateChart();
+    };
+
+    const updateChart = () => {
+        const freq = {};
+        rolls.forEach(num => freq[num] = (freq[num] || 0) + 1);
+        const data = Object.entries(freq).map(([value, count]) => ({ value: +value, count }));
+
+        barChart.data.labels = data.map(d => d.value);
+        barChart.data.datasets[0].data = data.map(d => d.count);
+        barChart.update();
+    };
+
+    const generateProblem = () => {
+        const problemTypes = [
+            {
+                question: 'Qual é a média dos resultados?',
+                calculate: () => (rolls.reduce((a, b) => a + b, 0) / rolls.length).toFixed(1)
+            },
+            {
+                question: 'Qual é a moda (valor mais frequente) dos resultados?',
+                calculate: () => {
+                    const freq = {};
+                    rolls.forEach(num => freq[num] = (freq[num] || 0) + 1);
+                    return Object.keys(freq).reduce((a, b) => freq[a] > freq[b] ? a : b);
+                }
+            },
+            {
+                question: () => {
+                    const target = Math.floor(Math.random() * (diceCount * 6 - diceCount + 1)) + diceCount;
+                    return {
+                        text: `Qual é a probabilidade de obter um ${target} em %?`,
+                        calculate: () => {
+                            const count = rolls.filter(num => num === target).length;
+                            return ((count / rolls.length) * 100).toFixed(1);
+                        },
+                        target
+                    };
+                }
+            }
+        ];
+
+        const selected = problemTypes[Math.floor(Math.random() * problemTypes.length)];
+        if (selected.question instanceof Function) {
+            const prob = selected.question();
+            return { question: prob.text, answer: prob.calculate() };
+        }
+        return { question: selected.question, answer: selected.calculate() };
+    };
+
+    const startNewRound = () => {
+        rollDice();
+        currentProblem = generateProblem();
+        problemEl.textContent = currentProblem.question;
+        userAnswerEl.value = '';
+        feedbackEl.textContent = '';
+        nextSection.style.display = 'none';
+    };
+
+    const checkAnswer = () => {
+        const userAnswer = parseFloat(userAnswerEl.value);
+        const correctAnswer = parseFloat(currentProblem.answer);
+
+        if (isNaN(userAnswer)) {
+            feedbackEl.textContent = 'Por favor, insere um número válido.';
+            return;
+        }
+
+        if (Math.abs(userAnswer - correctAnswer) < 0.1) {
+            score++;
+            feedbackEl.textContent = `Correto! A resposta era ${correctAnswer}.`;
+        } else {
+            feedbackEl.textContent = `Incorreto. A resposta correta era ${correctAnswer}.`;
+        }
+
+        scoreEl.textContent = `Pontuação: ${score}`;
+        nextSection.style.display = 'block';
+    };
+
+    const increaseDifficulty = () => {
+        diceCount = Math.min(diceCount + 1, 4);
+        diceCountEl.textContent = `Dados: ${diceCount}`;
+        startNewRound();
+    };
+
+    checkAnswerBtn.addEventListener('click', checkAnswer);
+    nextQuestionBtn.addEventListener('click', startNewRound);
+    increaseDifficultyBtn.addEventListener('click', increaseDifficulty);
+
+    startNewRound();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trigonometria no Círculo</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        .circle-container {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        svg {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+        }
+        .feedback {
+            font-size: 1.2em;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .tips {
+            font-size: 0.9em;
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container my-5">
+    <div class="card shadow">
+        <div class="card-body">
+            <h2 class="card-title text-center">Trigonometria no Círculo</h2>
+            <div class="text-center mb-3">Pontuação: <span id="score">0</span></div>
+            <div class="circle-container">
+                <svg id="circleSVG" width="300" height="300"></svg>
+            </div>
+            <div class="text-center mb-3">
+                <p id="question"></p>
+                <input
+                    type="number"
+                    id="userAnswer"
+                    step="0.01"
+                    class="form-control text-center mb-2"
+                    placeholder="Tua resposta"
+                />
+                <button id="checkAnswer" class="btn btn-primary w-100">Verificar</button>
+            </div>
+            <div id="feedback" class="feedback"></div>
+            <div class="text-center mt-3">
+                <button id="nextQuestion" class="btn btn-secondary w-100" style="display: none;">Próxima Questão</button>
+            </div>
+            <div class="tips">
+                <p><strong>Dicas:</strong></p>
+                <p>- sin(θ): Coordenada y no círculo unitário</p>
+                <p>- cos(θ): Coordenada x no círculo unitário</p>
+                <p>- tan(θ): Razão sin(θ)/cos(θ)</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const circleSVG = document.getElementById('circleSVG');
+    const questionEl = document.getElementById('question');
+    const feedbackEl = document.getElementById('feedback');
+    const userAnswerEl = document.getElementById('userAnswer');
+    const checkAnswerBtn = document.getElementById('checkAnswer');
+    const nextQuestionBtn = document.getElementById('nextQuestion');
+    const scoreEl = document.getElementById('score');
+
+    let score = 0;
+    let angle = 0;
+    let currentFunction = 'sin';
+
+    const radius = 100;
+    const centerX = 150;
+    const centerY = 150;
+
+    const generateNewProblem = () => {
+        angle = Math.floor(Math.random() * 360);
+        const functions = ['sin', 'cos', 'tan'];
+        currentFunction = functions[Math.floor(Math.random() * functions.length)];
+        questionEl.textContent = `Qual é o valor de ${currentFunction}(${angle}°)?`;
+        userAnswerEl.value = '';
+        feedbackEl.textContent = '';
+        nextQuestionBtn.style.display = 'none';
+        drawCircle();
+    };
+
+    const getCorrectAnswer = () => {
+        const radians = (angle * Math.PI) / 180;
+        switch (currentFunction) {
+            case 'sin':
+                return Math.sin(radians);
+            case 'cos':
+                return Math.cos(radians);
+            case 'tan':
+                return Math.tan(radians);
+            default:
+                return 0;
+        }
+    };
+
+    const checkAnswer = () => {
+        const userGuess = parseFloat(userAnswerEl.value);
+        const correct = getCorrectAnswer();
+
+        if (isNaN(userGuess)) {
+            feedbackEl.textContent = 'Por favor, insere um número válido.';
+            return;
+        }
+
+        if (Math.abs(userGuess - correct) < 0.1) {
+            score++;
+            feedbackEl.textContent = 'Correto! +1 ponto';
+        } else {
+            feedbackEl.textContent = `Incorreto. A resposta correta era ${correct.toFixed(2)}`;
+        }
+
+        scoreEl.textContent = score;
+        nextQuestionBtn.style.display = 'block';
+    };
+
+    const drawCircle = () => {
+        circleSVG.innerHTML = '';
+        const radians = (angle * Math.PI) / 180;
+        const x = centerX + radius * Math.cos(radians);
+        const y = centerY - radius * Math.sin(radians);
+
+        // Draw axes
+        circleSVG.innerHTML += `
+            <line x1="0" y1="${centerY}" x2="300" y2="${centerY}" stroke="black" />
+            <line x1="${centerX}" y1="0" x2="${centerX}" y2="300" stroke="black" />
+        `;
+
+        // Draw circle
+        circleSVG.innerHTML += `
+            <circle cx="${centerX}" cy="${centerY}" r="${radius}" fill="none" stroke="black" />
+        `;
+
+        // Draw angle ray
+        circleSVG.innerHTML += `
+            <line x1="${centerX}" y1="${centerY}" x2="${x}" y2="${y}" stroke="red" />
+        `;
+
+        // Draw angle arc
+        const arcX = centerX + 20 * Math.cos(radians);
+        const arcY = centerY - 20 * Math.sin(radians);
+        circleSVG.innerHTML += `
+            <path d="M ${centerX + 20} ${centerY} A 20 20 0 ${angle > 180 ? 1 : 0} 1 ${arcX} ${arcY}" stroke="blue" fill="none" />
+        `;
+    };
+
+    checkAnswerBtn.addEventListener('click', checkAnswer);
+    nextQuestionBtn.addEventListener('click', generateNewProblem);
+
+    generateNewProblem();
+</script>
+
+</body>
+</html>

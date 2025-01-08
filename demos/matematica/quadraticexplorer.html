@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explorador de Funções Quadráticas</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        .chart-container {
+            width: 500px;
+            margin: 20px auto;
+        }
+        .slider-label {
+            font-weight: bold;
+        }
+        .slider {
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container my-5">
+    <div class="card shadow">
+        <div class="card-body">
+            <h2 class="card-title text-center">Explorador de Funções Quadráticas</h2>
+            <p class="text-center">f(x) = ax² + bx + c</p>
+            <div class="mt-4">
+                <div class="mb-4">
+                    <label class="slider-label">a = <span id="aValue">1</span></label>
+                    <input type="range" id="aSlider" class="slider" min="-3" max="3" step="0.1" value="1">
+                </div>
+                <div class="mb-4">
+                    <label class="slider-label">b = <span id="bValue">0</span></label>
+                    <input type="range" id="bSlider" class="slider" min="-5" max="5" step="0.5" value="0">
+                </div>
+                <div class="mb-4">
+                    <label class="slider-label">c = <span id="cValue">0</span></label>
+                    <input type="range" id="cSlider" class="slider" min="-5" max="5" step="0.5" value="0">
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="quadraticChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const aSlider = document.getElementById('aSlider');
+    const bSlider = document.getElementById('bSlider');
+    const cSlider = document.getElementById('cSlider');
+    const aValue = document.getElementById('aValue');
+    const bValue = document.getElementById('bValue');
+    const cValue = document.getElementById('cValue');
+    const ctx = document.getElementById('quadraticChart').getContext('2d');
+
+    let quadraticChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: [],
+            datasets: [{
+                label: 'f(x) = ax² + bx + c',
+                data: [],
+                borderColor: '#8884d8',
+                fill: false
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                x: {
+                    type: 'linear',
+                    position: 'bottom',
+                    title: { display: true, text: 'x' },
+                    ticks: { stepSize: 1 }
+                },
+                y: {
+                    title: { display: true, text: 'f(x)' },
+                    ticks: { stepSize: 2 }
+                }
+            }
+        }
+    });
+
+    const updateChart = () => {
+        const a = parseFloat(aSlider.value);
+        const b = parseFloat(bSlider.value);
+        const c = parseFloat(cSlider.value);
+
+        aValue.textContent = a;
+        bValue.textContent = b;
+        cValue.textContent = c;
+
+        const points = [];
+        for (let x = -5; x <= 5; x += 0.5) {
+            points.push({ x, y: a * x * x + b * x + c });
+        }
+
+        quadraticChart.data.labels = points.map(p => p.x);
+        quadraticChart.data.datasets[0].data = points.map(p => p.y);
+        quadraticChart.update();
+    };
+
+    aSlider.addEventListener('input', updateChart);
+    bSlider.addEventListener('input', updateChart);
+    cSlider.addEventListener('input', updateChart);
+
+    updateChart();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Lançamento de Dados</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+
+
+        }
+        .dice-roll {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container my-5">
+    <div class="card shadow">
+        <div class="card-body">
+            <h2 class="card-title text-center">Simulador de Lançamento de Dados</h2>
+            <div class="d-flex gap-3 mb-4">
+                <button id="rollOnce" class="btn btn-primary">Lançar 1 vez</button>
+                <button id="rollTen" class="btn btn-primary">Lançar 10 vezes</button>
+                <button id="rollHundred" class="btn btn-primary">Lançar 100 vezes</button>
+                <button id="reset" class="btn btn-outline-secondary">Reiniciar</button>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="p-3 bg-light rounded">
+                        <h5>Medidas de Tendência Central</h5>
+                        <p>Total de lançamentos: <span id="totalRolls">0</span></p>
+                        <p>Média: <span id="mean">0.00</span></p>
+                        <p>Mediana: <span id="median">0.00</span></p>
+                        <p>Moda: <span id="mode">0</span></p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="p-3 bg-light rounded">
+                        <h5>Últimos 10 lançamentos</h5>
+                        <div id="lastRolls" class="d-flex gap-2 flex-wrap"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-4">
+                <canvas id="frequencyChart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const rolls = [];
+    const totalRollsElement = document.getElementById('totalRolls');
+    const meanElement = document.getElementById('mean');
+    const medianElement = document.getElementById('median');
+    const modeElement = document.getElementById('mode');
+    const lastRollsElement = document.getElementById('lastRolls');
+    const ctx = document.getElementById('frequencyChart').getContext('2d');
+
+    let frequencyChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: [1, 2, 3, 4, 5, 6],
+            datasets: [{
+                label: 'Frequência',
+                data: [0, 0, 0, 0, 0, 0],
+                backgroundColor: '#8884d8'
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                x: { title: { display: true, text: 'Faces do Dado' } },
+                y: { title: { display: true, text: 'Frequência' } }
+            }
+        }
+    });
+
+    const rollDice = (times) => {
+        for (let i = 0; i < times; i++) {
+            rolls.push(Math.floor(Math.random() * 6) + 1);
+        }
+        updateUI();
+    };
+
+    const calculateStats = () => {
+        if (rolls.length === 0) return { mean: 0, median: 0, mode: 0 };
+
+        const mean = rolls.reduce((sum, roll) => sum + roll, 0) / rolls.length;
+
+        const sorted = [...rolls].sort((a, b) => a - b);
+        const median = sorted.length % 2 === 0
+            ? (sorted[sorted.length / 2 - 1] + sorted[sorted.length / 2]) / 2
+            : sorted[Math.floor(sorted.length / 2)];
+
+        const freq = {};
+        rolls.forEach(roll => freq[roll] = (freq[roll] || 0) + 1);
+        const mode = Object.keys(freq).reduce((a, b) => freq[a] > freq[b] ? a : b);
+
+        return { mean, median, mode };
+    };
+
+    const updateChart = () => {
+        const frequencies = Array(6).fill(0);
+        rolls.forEach(roll => frequencies[roll - 1]++);
+        frequencyChart.data.datasets[0].data = frequencies;
+        frequencyChart.update();
+    };
+
+    const updateUI = () => {
+        const { mean, median, mode } = calculateStats();
+
+        totalRollsElement.textContent = rolls.length;
+        meanElement.textContent = mean.toFixed(2);
+        medianElement.textContent = median.toFixed(2);
+        modeElement.textContent = mode;
+
+        lastRollsElement.innerHTML = rolls.slice(-10).map(roll => `
+            <div class="dice-roll">${roll}</div>
+        `).join('');
+
+        updateChart();
+    };
+
+    document.getElementById('rollOnce').addEventListener('click', () => rollDice(1));
+    document.getElementById('rollTen').addEventListener('click', () => rollDice(10));
+    document.getElementById('rollHundred').addEventListener('click', () => rollDice(100));
+    document.getElementById('reset').addEventListener('click', () => {
+        rolls.length = 0;
+        updateUI();
+    });
+
+    updateUI();
+</script>
+
+</body>
+</html>
