@@ -2,42 +2,42 @@
     {
       "id": "pendulo",
       "titulo": "Pêndulo Simples",
-      "screenshot": "demos/fisica/screenshots/pendulo.jpg",
-      "arquivo": "demos/fisica/pendulo.html",
+      "screenshot": "pages/fisica/logo/pendulo.jpg",
+      "arquivo": "pages/fisica/pendulo.html",
       "descricao": "Simulação de um pêndulo com controles de comprimento e gravidade"
     },
     {
       "id": "mcu",
       "titulo": "Movimento Circular Uniforme",
-      "screenshot": "demos/fisica/screenshots/mcu.jpg",
-      "arquivo": "demos/fisica/mcu.html",
+      "screenshot": "pages/fisica/logo/mcu.jpg",
+      "arquivo": "pages/fisica/mcu.html",
       "descricao": "Visualização do MCU com controle de velocidade e raio"
     },
     {
       "id": "plano",
       "titulo": "Plano inclinado",
-      "screenshot": "demos/fisica/screenshots/plano.jpg",
-      "arquivo": "demos/fisica/plano.html",
+      "screenshot": "pages/fisica/logo/plano.jpg",
+      "arquivo": "pages/fisica/plano.html",
       "descricao": "Fisica no plano inclinado"
     },
     {
       "id": "Movimento Uniforme e Uniformemente Variado",
       "titulo": "Movimento Uniforme e Uniformemente Variado",
-      "screenshot": "demos/fisica/screenshots/mum.jpg",
-      "arquivo": "demos/fisica/mum.html",
+      "screenshot": "pages/fisica/logo/mum.jpg",
+      "arquivo": "pages/fisica/mum.html",
       "descricao": "Fisica no plano inclinado"
     },{
       "id": "mola",
       "titulo": "Lei de Hooke - Oscilação da Mola",
-      "screenshot": "demos/fisica/screenshots/mola.jpg",
-      "arquivo": "demos/fisica/mola.html",
+      "screenshot": "pages/fisica/logo/mola.jpg",
+      "arquivo": "pages/fisica/mola.html",
       "descricao": "Explore o comportamento oscilatório de uma mola ajustando constante elástica e massa."
     },
     {
       "id": "lancamento",
       "titulo": "Lançamento Oblíquo",
-      "screenshot": "demos/fisica/screenshots/lancamento.jpg",
-      "arquivo": "demos/fisica/lancamento.html",
+      "screenshot": "pages/fisica/logo/lancamento.jpg",
+      "arquivo": "pages/fisica/lancamento.html",
       "descricao": "Simulação de lançamento oblíquo com controle de ângulo e velocidade inicial"
     }
     

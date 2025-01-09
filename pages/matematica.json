@@ -2,106 +2,106 @@
   {
     "id": "funcquadratica",
     "titulo": "Função Quadrática",
-    "screenshot": "demos/matematica/screenshots/fquad.jpg",
-    "arquivo": "demos/matematica/fquad.html",
+    "screenshot": "pages/matematica/logo/fquad.jpg",
+    "arquivo": "pages/matematica/fquad.html",
     "descricao": "Jogo das Funções Quadráticas"
   },
   {
     "id": "probestatica",
     "titulo": "Probabilidade Estática",
-    "screenshot": "demos/matematica/screenshots/probestatica.jpg",
-    "arquivo": "demos/matematica/probestatica.html",
+    "screenshot": "pages/matematica/logo/probestatica.jpg",
+    "arquivo": "pages/matematica/probestatica.html",
     "descricao": "Probabilidade e Estatística"
   },
   {
     "id": "trinocircular",
     "titulo": "Trigonometria no Círculo",
-    "screenshot": "demos/matematica/screenshots/trinocircular.jpg",
-    "arquivo": "demos/matematica/trinocircular.html",
+    "screenshot": "pages/matematica/logo/trinocircular.jpg",
+    "arquivo": "pages/matematica/trinocircular.html",
     "descricao": "Jogo de Trigonometria no Círculo Unitário"
   },
   {
     "id": "sequencesgame",
     "titulo": "Jogo de Sequências",
-    "screenshot": "demos/matematica/screenshots/sequencias.jpg",
-    "arquivo": "demos/matematica/sequencias.html",
+    "screenshot": "pages/matematica/logo/sequencias.jpg",
+    "arquivo": "pages/matematica/sequencias.html",
     "descricao": "Identifica padrões em PA e PG e descobre o próximo número."
   },
   {
     "id": "geometrygame",
     "titulo": "Geometria Espacial",
-    "screenshot": "demos/matematica/screenshots/geometry.jpg",
-    "arquivo": "demos/matematica/geometry.html",
+    "screenshot": "pages/matematica/logo/geometry.jpg",
+    "arquivo": "pages/matematica/geometry.html",
     "descricao": "Descobre o volume de cubos, cilindros e prismas em desafios espaciais."
   },
   {
     "id": "quadraticexplorer",
     "titulo": "Explorador de Funções Quadráticas",
-    "screenshot": "demos/matematica/screenshots/quadraticexplorer.jpg",
-    "arquivo": "demos/matematica/quadraticexplorer.html",
+    "screenshot": "pages/matematica/logo/quadraticexplorer.jpg",
+    "arquivo": "pages/matematica/quadraticexplorer.html",
     "descricao": "Ajusta os coeficientes a, b, c e explora como a parábola muda no gráfico."
   },
   {
     "id": "pythagorasexplorer",
     "titulo": "Explorador do Teorema de Pitágoras",
-    "screenshot": "demos/matematica/screenshots/pythagorasexplorer.jpg",
-    "arquivo": "demos/matematica/pythagorasexplorer.html",
+    "screenshot": "pages/matematica/logo/pythagorasexplorer.jpg",
+    "arquivo": "pages/matematica/pythagorasexplorer.html",
     "descricao": "Visualiza como os catetos e a hipotenusa se relacionam no Teorema de Pitágoras."
   },
   {
     "id": "dicesimulator",
     "titulo": "Simulador de Lançamento de Dados",
-    "screenshot": "demos/matematica/screenshots/dicesimulator.jpg",
-    "arquivo": "demos/matematica/dicesimulator.html",
+    "screenshot": "pages/matematica/logo/dicesimulator.jpg",
+    "arquivo": "pages/matematica/dicesimulator.html",
     "descricao": "Explora estatísticas como média, moda e mediana com lançamentos de dados."
   },
   {
     "id": "linearsystem",
     "titulo": "Explorador de Sistemas Lineares",
-    "screenshot": "demos/matematica/screenshots/linearsystem.jpg",
-    "arquivo": "demos/matematica/linearsystem.html",
+    "screenshot": "pages/matematica/logo/linearsystem.jpg",
+    "arquivo": "pages/matematica/linearsystem.html",
     "descricao": "Explora visualmente sistemas de equações lineares e suas soluções"
   },
   {
     "id": "sequence_explorer",
     "titulo": "Explorador de Progressões",
-    "screenshot": "demos/matematica/screenshots/sequence_explorer.jpg",
-    "arquivo": "demos/matematica/sequence_explorer.html",
+    "screenshot": "pages/matematica/logo/sequence_explorer.jpg",
+    "arquivo": "pages/matematica/sequence_explorer.html",
     "descricao": "Explora progressões aritméticas e geométricas com gráficos e cálculos interativos."
   },
   {
     "id": "simulador_otimizacao",
     "titulo": "Simulador de Otimização",
-    "screenshot": "demos/matematica/screenshots/maxmin.jpg",
-    "arquivo": "demos/matematica/maxmin.html",
+    "screenshot": "pages/matematica/logo/maxmin.jpg",
+    "arquivo": "pages/matematica/maxmin.html",
     "descricao": "Maximiza a área mantendo o perímetro fixo. Visualiza e explore formas geométricas como retângulos, triângulos e círculos."
   },
   {
     "id": "jogo_lucro_maximo",
     "titulo": "Jogo do Lucro Máximo",
-    "screenshot": "demos/matematica/screenshots/lucromaximo.jpg",
-    "arquivo": "demos/matematica/lucromaximo.html",
+    "screenshot": "pages/matematica/logo/lucromaximo.jpg",
+    "arquivo": "pages/matematica/lucromaximo.html",
     "descricao": "Descobre o preço ótimo para maximizar o lucro com base no custo e demanda."
   },
   {
     "id": "explorador_derivadas",
     "titulo": "Explorador de Derivadas",
-    "screenshot": "demos/matematica/screenshots/derivadas.jpg",
-    "arquivo": "demos/matematica/derivadas.html",
+    "screenshot": "pages/matematica/logo/derivadas.jpg",
+    "arquivo": "pages/matematica/derivadas.html",
     "descricao": "Visualiza derivadas e tangentes interativas para funções matemáticas."
   },
   {
     "id": "circuitos_basicos",
     "titulo": "Simulador de Circuito Básico",
-    "screenshot": "demos/matematica/screenshots/circuitos_basicos.jpg",
-    "arquivo": "demos/matematica/circuitos_basicos.html",
+    "screenshot": "pages/matematica/logo/circuitos_basicos.jpg",
+    "arquivo": "pages/matematica/circuitos_basicos.html",
     "descricao": "Experimenta circuitos elétricos simples com componentes como bateria, resistor e LED. Visualiza a corrente, potência e brilho do LED em tempo real."
   },
   {
     "id": "circuito_capacitor",
     "titulo": "Simulador de Circuito com Capacitor",
-    "screenshot": "demos/matematica/screenshots/circuito_capacitor.jpg",
-    "arquivo": "demos/matematica/circuito_capacitor.html",
+    "screenshot": "pages/matematica/logo/circuito_capacitor.jpg",
+    "arquivo": "pages/matematica/circuito_capacitor.html",
     "descricao": "SimulA o comportamento de um capacitor em um circuito RC simples, ajustando tensão e capacitância para observar como o capacitor carrega e descarrega."
   }
   

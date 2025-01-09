@@ -1,0 +1,17 @@
+[
+    {
+      "id": "microcontroladores",
+      "titulo": "Microcontroladores",
+      "screenshot": "pages/robotica/logo/microcontroladores.jpg",
+      "arquivo": "pages/robotica/microcontroladores.html",
+      "descricao": "Descubre as características e aplicações das placas mais populares, como Arduino, ESP32, Raspberry Pi Pico e Micro:bit."
+    },
+    {
+      "id": "comunicacao_pinos_protocolos",
+      "titulo": "Comunicação, Pinos e Protocolos",
+      "screenshot": "pages/robotica/logo/comunicacao_protocolos.jpg",
+      "arquivo": "pages/robotica/comunicacao_pinos_protocolos.html",
+      "descricao": "Explora os principais protocolos de comunicação (I2C, SPI, UART, CAN) e entenda como os pinos GPIO são usados para conectar sensores e dispositivos."
+    }
+  ]
+  

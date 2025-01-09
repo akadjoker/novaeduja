@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Comunicação: Pinos e Protocolos</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <style>
+    body {
+        margin: 5%;
+  
+
+        height: 95%;
+    }
+
+</style>
+</head>
+<body>
+  <div class="container my-5">
+    <h2 class="text-center mb-4">Comunicação: Pinos e Protocolos</h2>
+    <p>
+      A comunicação é uma das partes mais importantes no uso de microcontroladores. Para conectar sensores, atuadores e outros dispositivos, usamos diferentes pinos e protocolos, cada um com características específicas.
+    </p>
+
+    <h3 class="mt-5">Tipos de Pinos de Comunicação</h3>
+    <ul>
+      <li><strong>GPIO:</strong> Pinos gerais usados para entrada ou saída de sinais digitais ou analógicos.</li>
+      <li><strong>SDA/SCL:</strong> Pinos dedicados ao protocolo I2C (dados e clock).</li>
+      <li><strong>MOSI/MISO/SCK/CS:</strong> Pinos usados pelo protocolo SPI (envio, receção, clock e seleção de dispositivo).</li>
+      <li><strong>RX/TX:</strong> Pinos para comunicação serial (UART).</li>
+      <li><strong>CAN:</strong> Pinos usados em comunicação automotiva e industrial.</li>
+    </ul>
+
+    <h3 class="mt-5">Protocolos Mais Usados</h3>
+    <div class="row">
+      <!-- I2C -->
+      <div class="col-md-6 mb-4">
+        <div class="card">
+          <div class="card-header bg-primary text-white">
+            <h4>I2C</h4>
+          </div>
+          <div class="card-body">
+            <ul>
+              <li><strong>Linhas:</strong> SDA (dados), SCL (clock).</li>
+              <li><strong>Velocidade:</strong> Até 400 kHz (modo rápido).</li>
+              <li><strong>Vantagens:</strong> Simples, suporta múltiplos dispositivos no mesmo barramento.</li>
+              <li><strong>Usos:</strong> Sensores, displays, EEPROMs.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- SPI -->
+      <div class="col-md-6 mb-4">
+        <div class="card">
+          <div class="card-header bg-primary text-white">
+            <h4>SPI</h4>
+          </div>
+          <div class="card-body">
+            <ul>
+              <li><strong>Linhas:</strong> MOSI, MISO, SCK, CS.</li>
+              <li><strong>Velocidade:</strong> Até 10 Mbps.</li>
+              <li><strong>Vantagens:</strong> Alta velocidade, comunicação full-duplex.</li>
+              <li><strong>Usos:</strong> Memórias Flash, módulos de rádio.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- UART -->
+      <div class="col-md-6 mb-4">
+        <div class="card">
+          <div class="card-header bg-primary text-white">
+            <h4>UART</h4>
+          </div>
+          <div class="card-body">
+            <ul>
+              <li><strong>Linhas:</strong> RX, TX.</li>
+              <li><strong>Velocidade:</strong> Até 1 Mbps.</li>
+              <li><strong>Vantagens:</strong> Simples, amplamente suportado.</li>
+              <li><strong>Usos:</strong> Comunicação entre microcontroladores, módulos Bluetooth.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- CAN -->
+      <div class="col-md-6 mb-4">
+        <div class="card">
+          <div class="card-header bg-primary text-white">
+            <h4>CAN</h4>
+          </div>
+          <div class="card-body">
+            <ul>
+              <li><strong>Linhas:</strong> CAN High, CAN Low.</li>
+              <li><strong>Velocidade:</strong> Até 1 Mbps.</li>
+              <li><strong>Vantagens:</strong> Robusto, ideal para ambientes ruidosos.</li>
+              <li><strong>Usos:</strong> Automóveis, robótica, indústria.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="mt-5">Comparação de Protocolos</h3>
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>Protocolo</th>
+          <th>Número de Linhas</th>
+          <th>Velocidade Máxima</th>
+          <th>Vantagens</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>I2C</td>
+          <td>2</td>
+          <td>400 kHz</td>
+          <td>Fácil de implementar, suporta múltiplos dispositivos.</td>
+        </tr>
+        <tr>
+          <td>SPI</td>
+          <td>4</td>
+          <td>10 Mbps</td>
+          <td>Alta velocidade, comunicação full-duplex.</td>
+        </tr>
+        <tr>
+          <td>UART</td>
+          <td>2</td>
+          <td>1 Mbps</td>
+          <td>Simples, amplamente compatível.</td>
+        </tr>
+        <tr>
+          <td>CAN</td>
+          <td>2</td>
+          <td>1 Mbps</td>
+          <td>Robusto, ideal para ambientes industriais.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</body>
+</html>
